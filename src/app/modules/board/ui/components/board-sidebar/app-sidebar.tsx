@@ -9,11 +9,12 @@ import {
   Search,
   CalendarCheck,
   Home,
+  UserPlus,
 } from "lucide-react";
 
 import { NavMyProjects } from "./nav-my-projects";
 import { NavInvitedProjects } from "./nav-invited-projects";
-import { NavUser } from "./nav-user";
+import { NavCreateProject } from "./nav-create-project";
 import { NavLogo } from "./nav-logo";
 import { NavMain } from "./nav-main";
 
@@ -50,7 +51,6 @@ const data = {
   ],
 };
 
-// Add this new mainNavItems configuration
 const mainNavItems = [
   {
     title: "Search",
@@ -61,6 +61,11 @@ const mainNavItems = [
     title: "Home",
     url: "/board/home",
     icon: Home,
+  },
+  {
+    title: "Invite People",
+    url: "/board/invite",
+    icon: UserPlus,
   },
   {
     title: "Today's Todos",
@@ -88,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavInvitedProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavCreateProject />
       </SidebarFooter>
     </Sidebar>
   );

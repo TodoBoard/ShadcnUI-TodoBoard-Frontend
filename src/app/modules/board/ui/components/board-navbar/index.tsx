@@ -1,15 +1,9 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
-import { Home } from "lucide-react";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { UserAvatar } from "./user-avatar";
+import { DynamicBreadcrumb } from "@/hooks/dynamic-breadcrumb";
+
 
 export const BoardNavbar = () => {
   return (
@@ -17,26 +11,10 @@ export const BoardNavbar = () => {
       <div className="flex items-center gap-2 px-4 flex-1">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#">
-                <Home size={16} strokeWidth={2} aria-hidden="true" />
-                <span className="sr-only">Home</span>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#">Components</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <div className="ml-auto">
+        <DynamicBreadcrumb />
+        <div className="ml-auto flex items-center gap-2">
           <ModeToggle />
+          <UserAvatar />
         </div>
       </div>
     </header>

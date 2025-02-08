@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CalendarCheck2 } from "lucide-react";
-import { NotificationBell } from "../notification-bell";
+import { NotificationBell } from "./notification-bell";
 
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
 
