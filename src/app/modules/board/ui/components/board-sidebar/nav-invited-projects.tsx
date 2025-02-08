@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function NavInvitedProjects({
   projects,
@@ -41,6 +42,7 @@ export function NavInvitedProjects({
 }) {
   const { isMobile } = useSidebar();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathname = usePathname();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -75,8 +77,21 @@ export function NavInvitedProjects({
           {projects.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
+                <a
+                  href={item.url}
+                  className={cn({
+                    "bg-sidebar-accent": pathname === item.url,
+                    "text-sidebar-primary": pathname === item.url,
+                    "text-muted-foreground": pathname !== item.url,
+                    "flex items-center gap-2 p-2 rounded": true,
+                  })}
+                >
+                  <item.icon
+                    className={cn({
+                      "text-sidebar-primary": pathname === item.url,
+                      "text-muted-foreground": pathname !== item.url,
+                    })}
+                  />
                   <span>{item.name}</span>
                 </a>
               </SidebarMenuButton>

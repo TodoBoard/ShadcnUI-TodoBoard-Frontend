@@ -25,14 +25,13 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  projects: [
+  myProjects: [
     {
       name: "Design Engineering",
       url: "#",
@@ -45,7 +44,14 @@ const data = {
     },
     {
       name: "Travel",
-      url: "#",
+      url: "/board/projects/my-projects/travel",
+      icon: Map,
+    },
+  ],
+  invitedProjects: [
+    {
+      name: "Travel",
+      url: "/board/projects/invited-projects/travel",
       icon: Map,
     },
   ],
@@ -89,8 +95,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItemsWithActive} />
-        <NavMyProjects projects={data.projects} />
-        <NavInvitedProjects projects={data.projects} />
+        <NavMyProjects projects={data.myProjects} />
+        <NavInvitedProjects projects={data.invitedProjects} />
       </SidebarContent>
       <SidebarFooter>
         <NavCreateProject />

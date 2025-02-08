@@ -1,6 +1,3 @@
 export default function TodayPage() {
-  return (
-      <div>Today</div>
-  );
-};
-
+  return <h1 className="font-bold text-2xl">Today</h1>;
+}
