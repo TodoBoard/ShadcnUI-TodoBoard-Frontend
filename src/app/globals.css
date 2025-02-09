@@ -86,3 +86,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .home-container {
+    @apply w-full mx-auto;
+    padding: 1rem;
+  }
+
+  @screen 2xl {
+    .home-container {
+      max-width: 1400px;
+    }
+  }
+}
