@@ -262,8 +262,9 @@ export default function MyProjectsTravelPage() {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
           modifiers={[
-            (args: { transform: { x: number; y: number } }) => ({
-              ...args,
+            (args) => ({
+              scaleX: 1,
+              scaleY: 1,
               x: 0,
               y: args.transform.y,
             }),
