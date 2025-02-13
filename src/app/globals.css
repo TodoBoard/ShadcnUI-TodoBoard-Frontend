@@ -76,6 +76,25 @@ body {
     --sidebar-border: 267 20% 20%;
     --sidebar-ring: 267 75% 65%;
   }
+
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 5px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
 }
 
 @layer base {
@@ -84,19 +103,5 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer components {
-  .home-container {
-    @apply w-full mx-auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  @screen 2xl {
-    .home-container {
-      max-width: 1400px;
-    }
   }
 }

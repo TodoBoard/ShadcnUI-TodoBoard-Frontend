@@ -93,7 +93,7 @@ export default {
         center: true,
         padding: "2rem",
         screens: {
-          "2xl": "900px",
+          "2xl": "1100px",
         },
       },
     },

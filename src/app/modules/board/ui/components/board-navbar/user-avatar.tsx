@@ -4,7 +4,7 @@ export const UserAvatar = () => {
   return (
     <div className="relative">
       <Avatar className="h-9 w-9">
-        <AvatarImage alt="Kelly King" />
+        <AvatarImage src="/board/user/picture/4.png" alt="Kelly King" />
         <AvatarFallback>KK</AvatarFallback>
       </Avatar>
 

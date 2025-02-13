@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Plus, GripVertical } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Pencil } from "lucide-react";
 import { useState } from "react";
 import {
   Select,
@@ -27,22 +27,6 @@ import {
 } from "@/app/modules/board/ui/components/task-card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 interface TaskFormData {
   title: string;
@@ -55,27 +39,25 @@ interface TaskFormData {
 interface Task extends TaskFormData {
   id: string;
   completed: boolean;
+  creator: {
+    name: string;
+    avatar: string;
+  };
 }
 
-function SortableTaskItem({
+function TaskItem({
   task,
   toggleTaskComplete,
+  onEdit,
 }: {
   task: Task;
   toggleTaskComplete: (id: string) => void;
+  onEdit: (task: Task) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: task.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   return (
-    <div ref={setNodeRef} style={style}>
-      <div className="flex items-center gap-3 py-1.5">
-        <button
+      <div>
+        <div className="flex items-center gap-3 py-1.5">
+          <button
           onClick={() => toggleTaskComplete(task.id)}
           className={cn(
             "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors shrink-0",
@@ -133,21 +115,33 @@ function SortableTaskItem({
                 </span>
               </div>
             )}
+            <button
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={() => onEdit(task)}
+            >
+              <Pencil className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+            </button>
           </div>
         </div>
-        <button
-          className="cursor-grab hover:text-purple-500 text-gray-400"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
       </div>
-      {task.description && (
-        <p className="text-xs text-gray-500 ml-7 break-words">
-          {task.description}
-        </p>
-      )}
+      <div className="ml-7 space-y-1">
+        {task.description && (
+          <p className="text-xs text-gray-500 break-words">
+            {task.description}
+          </p>
+        )}
+        <div className="flex justify-between items-center">
+          <div />
+          <div className="flex items-center gap-1.5">
+            <img
+              src={task.creator.avatar}
+              alt={task.creator.name}
+              className="w-4 h-4 rounded-full"
+            />
+            <span className="text-xs text-gray-400">{task.creator.name}</span>
+          </div>
+        </div>
+      </div>
       <Separator className="my-1.5" />
     </div>
   );
@@ -166,6 +160,7 @@ export default function MyProjectsTravelPage() {
     dueTime: null,
     priority: "default",
   });
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   // Mock time slots data
   const timeSlots = [
@@ -202,25 +197,30 @@ export default function MyProjectsTravelPage() {
     { time: "00:00", available: true },
   ];
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: { x: 0, y: 10 },
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newTask: Task = {
-      ...formData,
-      id: Math.random().toString(36).substr(2, 9),
-      completed: false,
-    };
-    setTasks([...tasks, newTask]);
+    if (editingTask) {
+      // Update existing task
+      setTasks(
+        tasks.map((task) =>
+          task.id === editingTask.id ? { ...task, ...formData } : task
+        )
+      );
+      setEditingTask(null);
+    } else {
+      // Create new task
+      const newTask: Task = {
+        ...formData,
+        id: Math.random().toString(36).substr(2, 9),
+        completed: false,
+        creator: {
+          name: "You",
+          avatar: "/board/user/picture/4.png",
+        },
+      };
+      setTasks([...tasks, newTask]);
+    }
+
     setIsFormVisible(false);
     setFormData({
       title: "",
@@ -239,47 +239,65 @@ export default function MyProjectsTravelPage() {
     );
   };
 
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      setTasks((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setFormData({
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      dueTime: task.dueTime,
+      priority: task.priority,
+    });
+    setDate(task.dueDate);
+    setTime(task.dueTime);
+    setIsFormVisible(true);
   };
 
   return (
     <div className="p-6">
-      <h1 className="font-bold text-2xl">Travel</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-bold text-2xl">Travel</h1>
+        <div className="flex -space-x-2">
+          <img
+            className="rounded-full ring-2 ring-background w-8 h-8"
+            src="/board/user/picture/1.png"
+            width={32}
+            height={32}
+            alt="Collaborator 1"
+          />
+          <img
+            className="rounded-full ring-2 ring-background w-8 h-8"
+            src="/board/user/picture/2.png"
+            width={32}
+            height={32}
+            alt="Collaborator 2"
+          />
+          <img
+            className="rounded-full ring-2 ring-background w-8 h-8"
+            src="/board/user/picture/3.png"
+            width={32}
+            height={32}
+            alt="Collaborator 3"
+          />
+          <img
+            className="rounded-full ring-2 ring-background w-8 h-8"
+            src="/board/user/picture/4.png"
+            width={32}
+            height={32}
+            alt="Collaborator 4"
+          />
+        </div>
+      </div>
 
       <div className="mt-5 space-y-2">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-          modifiers={[
-            (args) => ({
-              scaleX: 1,
-              scaleY: 1,
-              x: 0,
-              y: args.transform.y,
-            }),
-          ]}
-        >
-          <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
-            {tasks.map((task) => (
-              <SortableTaskItem
-                key={task.id}
-                task={task}
-                toggleTaskComplete={toggleTaskComplete}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
+        {tasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            toggleTaskComplete={toggleTaskComplete}
+            onEdit={handleEditTask}
+          />
+        ))}
 
         {!isFormVisible && (
           <button
@@ -486,7 +504,17 @@ export default function MyProjectsTravelPage() {
 
                 <div className="flex gap-1.5">
                   <Button
-                    onClick={() => setIsFormVisible(false)}
+                    onClick={() => {
+                      setIsFormVisible(false);
+                      setEditingTask(null);
+                      setFormData({
+                        title: "",
+                        description: "",
+                        dueDate: undefined,
+                        dueTime: null,
+                        priority: "default",
+                      });
+                    }}
                     variant="ghost"
                     size="sm"
                     className="h-7 text-xs"
@@ -494,7 +522,7 @@ export default function MyProjectsTravelPage() {
                     Cancel
                   </Button>
                   <Button type="submit" size="sm" className="h-7 text-xs">
-                    Add task
+                    {editingTask ? "Save changes" : "Add task"}
                   </Button>
                 </div>
               </TaskCardFooter>
