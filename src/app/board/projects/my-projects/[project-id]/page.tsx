@@ -55,9 +55,9 @@ function TaskItem({
   onEdit: (task: Task) => void;
 }) {
   return (
-      <div>
-        <div className="flex items-center gap-3 py-1.5">
-          <button
+    <div>
+      <div className="flex items-center gap-3 py-1.5">
+        <button
           onClick={() => toggleTaskComplete(task.id)}
           className={cn(
             "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors shrink-0",
@@ -161,6 +161,7 @@ export default function MyProjectsTravelPage() {
     priority: "default",
   });
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   // Mock time slots data
   const timeSlots = [
@@ -207,6 +208,7 @@ export default function MyProjectsTravelPage() {
         )
       );
       setEditingTask(null);
+      setIsFormVisible(false);
     } else {
       // Create new task
       const newTask: Task = {
@@ -221,7 +223,6 @@ export default function MyProjectsTravelPage() {
       setTasks([...tasks, newTask]);
     }
 
-    setIsFormVisible(false);
     setFormData({
       title: "",
       description: "",
@@ -229,6 +230,8 @@ export default function MyProjectsTravelPage() {
       dueTime: null,
       priority: "default",
     });
+    setDate(undefined);
+    setTime(null);
   };
 
   const toggleTaskComplete = (taskId: string) => {
@@ -290,16 +293,566 @@ export default function MyProjectsTravelPage() {
       </div>
 
       <div className="mt-5 space-y-2">
-        {tasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            toggleTaskComplete={toggleTaskComplete}
-            onEdit={handleEditTask}
-          />
-        ))}
+        {/* Active Tasks */}
+        {tasks
+          .filter((task) => !task.completed)
+          .map((task) =>
+            editingTask?.id === task.id ? (
+              <TaskCard key={task.id}>
+                <form onSubmit={handleSubmit}>
+                  <TaskCardHeader>
+                    <input
+                      placeholder="Task name"
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
+                      className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
+                    />
+                  </TaskCardHeader>
+                  <TaskCardContent>
+                    <textarea
+                      placeholder="Description"
+                      value={formData.description}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full bg-transparent border-none resize-none outline-none text-xs text-gray-500 placeholder:text-muted-foreground focus:outline-none break-words"
+                      rows={2}
+                    />
 
-        {!isFormVisible && (
+                    <div className="flex flex-wrap gap-1.5">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-1 h-3 w-3" />
+                            {date ? (
+                              <span>
+                                {format(date, "PPP")}
+                                {time && ` at ${time}`}
+                              </span>
+                            ) : (
+                              <span>No date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <div className="rounded-lg border">
+                            <div className="flex max-sm:flex-col">
+                              <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={(newDate) => {
+                                  if (newDate) {
+                                    setDate(newDate);
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      dueDate: newDate,
+                                    }));
+                                    setTime(null);
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      dueTime: null,
+                                    }));
+                                  }
+                                }}
+                                className="p-2 sm:pe-5"
+                                disabled={[{ before: today }]}
+                                initialFocus
+                              />
+                              <div className="relative w-full max-sm:h-48 sm:w-40">
+                                <div className="absolute inset-0 border-border py-4 max-sm:border-t">
+                                  <ScrollArea className="h-full border-border sm:border-s">
+                                    <div className="space-y-3">
+                                      <div className="flex h-5 shrink-0 items-center px-5">
+                                        <p className="text-sm font-medium">
+                                          {date
+                                            ? format(date, "EEEE, d")
+                                            : "Select a date"}
+                                        </p>
+                                      </div>
+                                      <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
+                                        {timeSlots.map(
+                                          ({ time: timeSlot, available }) => (
+                                            <Button
+                                              key={timeSlot}
+                                              variant={
+                                                time === timeSlot
+                                                  ? "default"
+                                                  : "outline"
+                                              }
+                                              size="sm"
+                                              className="w-full"
+                                              onClick={() => {
+                                                setTime(timeSlot);
+                                                setFormData((prev) => ({
+                                                  ...prev,
+                                                  dueTime: timeSlot,
+                                                }));
+                                              }}
+                                              disabled={!available || !date}
+                                            >
+                                              {timeSlot}
+                                            </Button>
+                                          )
+                                        )}
+                                      </div>
+                                    </div>
+                                  </ScrollArea>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+
+                      <Select
+                        value={formData.priority}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, priority: value })
+                        }
+                      >
+                        <SelectTrigger className="h-7 w-[100px] text-xs">
+                          <SelectValue placeholder="Priority">
+                            {formData.priority && (
+                              <div className="flex items-center">
+                                <div
+                                  className={cn(
+                                    "w-2 h-2 rounded-full mr-2",
+                                    formData.priority === "default" &&
+                                      "bg-gray-300",
+                                    formData.priority === "low" &&
+                                      "bg-green-500",
+                                    formData.priority === "medium" &&
+                                      "bg-yellow-500",
+                                    formData.priority === "high" && "bg-red-500"
+                                  )}
+                                />
+                                {formData.priority === "default"
+                                  ? "Default"
+                                  : formData.priority.charAt(0).toUpperCase() +
+                                    formData.priority.slice(1)}
+                              </div>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem
+                            value="default"
+                            className="flex items-center"
+                          >
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-gray-300 mr-2" />
+                              Default
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="low" className="flex items-center">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                              Low
+                            </div>
+                          </SelectItem>
+                          <SelectItem
+                            value="medium"
+                            className="flex items-center"
+                          >
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" />
+                              Medium
+                            </div>
+                          </SelectItem>
+                          <SelectItem
+                            value="high"
+                            className="flex items-center"
+                          >
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
+                              High
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        More
+                      </Button>
+                    </div>
+                  </TaskCardContent>
+                  <Separator className="my-2" />
+                  <TaskCardFooter className="pt-2 flex justify-between items-center">
+                    <Select>
+                      <SelectTrigger className="h-7 w-[150px] text-xs">
+                        <SelectValue placeholder="Select project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="travel">Travel</SelectItem>
+                        <SelectItem value="work">Work</SelectItem>
+                        <SelectItem value="personal">Personal</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <div className="flex gap-1.5">
+                      <Button
+                        onClick={() => {
+                          setEditingTask(null);
+                          setFormData({
+                            title: "",
+                            description: "",
+                            dueDate: undefined,
+                            dueTime: null,
+                            priority: "default",
+                          });
+                          setDate(undefined);
+                          setTime(null);
+                          setIsFormVisible(false);
+                        }}
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs"
+                      >
+                        Cancel
+                      </Button>
+                      <Button type="submit" size="sm" className="h-7 text-xs">
+                        Save changes
+                      </Button>
+                    </div>
+                  </TaskCardFooter>
+                </form>
+              </TaskCard>
+            ) : (
+              <TaskItem
+                key={task.id}
+                task={task}
+                toggleTaskComplete={toggleTaskComplete}
+                onEdit={handleEditTask}
+              />
+            )
+          )}
+
+        {/* Completed Tasks Section */}
+        {tasks.some((task) => task.completed) && (
+          <div className="mt-6">
+            <button
+              onClick={() => setShowCompleted(!showCompleted)}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <div
+                className={cn(
+                  "transform transition-transform",
+                  showCompleted ? "rotate-90" : ""
+                )}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 12L10 8L6 4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <span>Completed</span>
+              <span className="text-xs text-gray-400">
+                ({tasks.filter((task) => task.completed).length})
+              </span>
+            </button>
+
+            {showCompleted && (
+              <div className="mt-2 space-y-2">
+                {tasks
+                  .filter((task) => task.completed)
+                  .map((task) =>
+                    editingTask?.id === task.id ? (
+                      <TaskCard key={task.id}>
+                        <form onSubmit={handleSubmit}>
+                          <TaskCardHeader>
+                            <input
+                              placeholder="Task name"
+                              value={formData.title}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  title: e.target.value,
+                                })
+                              }
+                              className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
+                            />
+                          </TaskCardHeader>
+                          <TaskCardContent>
+                            <textarea
+                              placeholder="Description"
+                              value={formData.description}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  description: e.target.value,
+                                })
+                              }
+                              className="w-full bg-transparent border-none resize-none outline-none text-xs text-gray-500 placeholder:text-muted-foreground focus:outline-none break-words"
+                              rows={2}
+                            />
+
+                            <div className="flex flex-wrap gap-1.5">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs justify-start text-left font-normal"
+                                  >
+                                    <CalendarIcon className="mr-1 h-3 w-3" />
+                                    {date ? (
+                                      <span>
+                                        {format(date, "PPP")}
+                                        {time && ` at ${time}`}
+                                      </span>
+                                    ) : (
+                                      <span>No date</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className="w-auto p-0"
+                                  align="start"
+                                >
+                                  <div className="rounded-lg border">
+                                    <div className="flex max-sm:flex-col">
+                                      <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={(newDate) => {
+                                          if (newDate) {
+                                            setDate(newDate);
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              dueDate: newDate,
+                                            }));
+                                            setTime(null);
+                                            setFormData((prev) => ({
+                                              ...prev,
+                                              dueTime: null,
+                                            }));
+                                          }
+                                        }}
+                                        className="p-2 sm:pe-5"
+                                        disabled={[{ before: today }]}
+                                        initialFocus
+                                      />
+                                      <div className="relative w-full max-sm:h-48 sm:w-40">
+                                        <div className="absolute inset-0 border-border py-4 max-sm:border-t">
+                                          <ScrollArea className="h-full border-border sm:border-s">
+                                            <div className="space-y-3">
+                                              <div className="flex h-5 shrink-0 items-center px-5">
+                                                <p className="text-sm font-medium">
+                                                  {date
+                                                    ? format(date, "EEEE, d")
+                                                    : "Select a date"}
+                                                </p>
+                                              </div>
+                                              <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
+                                                {timeSlots.map(
+                                                  ({
+                                                    time: timeSlot,
+                                                    available,
+                                                  }) => (
+                                                    <Button
+                                                      key={timeSlot}
+                                                      variant={
+                                                        time === timeSlot
+                                                          ? "default"
+                                                          : "outline"
+                                                      }
+                                                      size="sm"
+                                                      className="w-full"
+                                                      onClick={() => {
+                                                        setTime(timeSlot);
+                                                        setFormData((prev) => ({
+                                                          ...prev,
+                                                          dueTime: timeSlot,
+                                                        }));
+                                                      }}
+                                                      disabled={
+                                                        !available || !date
+                                                      }
+                                                    >
+                                                      {timeSlot}
+                                                    </Button>
+                                                  )
+                                                )}
+                                              </div>
+                                            </div>
+                                          </ScrollArea>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+
+                              <Select
+                                value={formData.priority}
+                                onValueChange={(value) =>
+                                  setFormData({ ...formData, priority: value })
+                                }
+                              >
+                                <SelectTrigger className="h-7 w-[100px] text-xs">
+                                  <SelectValue placeholder="Priority">
+                                    {formData.priority && (
+                                      <div className="flex items-center">
+                                        <div
+                                          className={cn(
+                                            "w-2 h-2 rounded-full mr-2",
+                                            formData.priority === "default" &&
+                                              "bg-gray-300",
+                                            formData.priority === "low" &&
+                                              "bg-green-500",
+                                            formData.priority === "medium" &&
+                                              "bg-yellow-500",
+                                            formData.priority === "high" &&
+                                              "bg-red-500"
+                                          )}
+                                        />
+                                        {formData.priority === "default"
+                                          ? "Default"
+                                          : formData.priority
+                                              .charAt(0)
+                                              .toUpperCase() +
+                                            formData.priority.slice(1)}
+                                      </div>
+                                    )}
+                                  </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem
+                                    value="default"
+                                    className="flex items-center"
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-2 h-2 rounded-full bg-gray-300 mr-2" />
+                                      Default
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="low"
+                                    className="flex items-center"
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                                      Low
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="medium"
+                                    className="flex items-center"
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" />
+                                      Medium
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem
+                                    value="high"
+                                    className="flex items-center"
+                                  >
+                                    <div className="flex items-center">
+                                      <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
+                                      High
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs"
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                More
+                              </Button>
+                            </div>
+                          </TaskCardContent>
+                          <Separator className="my-2" />
+                          <TaskCardFooter className="pt-2 flex justify-between items-center">
+                            <Select>
+                              <SelectTrigger className="h-7 w-[150px] text-xs">
+                                <SelectValue placeholder="Select project" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="travel">Travel</SelectItem>
+                                <SelectItem value="work">Work</SelectItem>
+                                <SelectItem value="personal">
+                                  Personal
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+
+                            <div className="flex gap-1.5">
+                              <Button
+                                onClick={() => {
+                                  setEditingTask(null);
+                                  setFormData({
+                                    title: "",
+                                    description: "",
+                                    dueDate: undefined,
+                                    dueTime: null,
+                                    priority: "default",
+                                  });
+                                  setDate(undefined);
+                                  setTime(null);
+                                  setIsFormVisible(false);
+                                }}
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-xs"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                type="submit"
+                                size="sm"
+                                className="h-7 text-xs"
+                              >
+                                Save changes
+                              </Button>
+                            </div>
+                          </TaskCardFooter>
+                        </form>
+                      </TaskCard>
+                    ) : (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        toggleTaskComplete={toggleTaskComplete}
+                        onEdit={handleEditTask}
+                      />
+                    )
+                  )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {!editingTask && !isFormVisible && (
           <button
             onClick={() => setIsFormVisible(true)}
             className="flex items-center relative group mt-2"
@@ -313,7 +866,7 @@ export default function MyProjectsTravelPage() {
           </button>
         )}
 
-        {isFormVisible && (
+        {!editingTask && isFormVisible && (
           <TaskCard className="mt-4">
             <form onSubmit={handleSubmit}>
               <TaskCardHeader>
@@ -506,7 +1059,6 @@ export default function MyProjectsTravelPage() {
                   <Button
                     onClick={() => {
                       setIsFormVisible(false);
-                      setEditingTask(null);
                       setFormData({
                         title: "",
                         description: "",
@@ -531,7 +1083,7 @@ export default function MyProjectsTravelPage() {
         )}
       </div>
 
-      {!isFormVisible && tasks.length === 0 && <NoTasks />}
+      {!isFormVisible && !editingTask && tasks.length === 0 && <NoTasks />}
     </div>
   );
 }

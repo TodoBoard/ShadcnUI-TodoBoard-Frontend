@@ -17,6 +17,8 @@ import { NavInvitedProjects } from "./nav-invited-projects";
 import { NavCreateProject } from "./nav-create-project";
 import { NavLogo } from "./nav-logo";
 import { NavMain } from "./nav-main";
+import { NavInvitePeopleDialog } from "../board-dialog/invite-people-dialog";
+import { SearchDialog } from "../board-dialog/search-dialog";
 
 import {
   Sidebar,
@@ -60,8 +62,17 @@ const data = {
 const mainNavItems = [
   {
     title: "Search",
-    url: "/board/search",
+    dialog: true,
     icon: Search,
+    shortcut: "K",
+    dialogComponent: function (triggerContent: React.ReactNode) {
+      return (
+        <SearchDialog
+          triggerContent={triggerContent}
+          shortcut={this.shortcut}
+        />
+      );
+    },
   },
   {
     title: "Home",
@@ -70,8 +81,17 @@ const mainNavItems = [
   },
   {
     title: "Invite People",
-    url: "/board/invite",
+    dialog: true,
     icon: UserPlus,
+    shortcut: "I",
+    dialogComponent: function (triggerContent: React.ReactNode) {
+      return (
+        <NavInvitePeopleDialog
+          triggerContent={triggerContent}
+          shortcut={this.shortcut}
+        />
+      );
+    },
   },
   {
     title: "Today's Todos",
