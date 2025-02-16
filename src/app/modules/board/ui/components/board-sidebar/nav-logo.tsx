@@ -16,7 +16,7 @@ export function NavLogo() {
               <CalendarCheck2 className="size-4" />
             </div>
             <div className="flex flex-col gap-0.5 leading-none">
-              <span className="font-semibold text-md">TodoApp</span>
+              <span className="font-semibold text-md">TodoBoard</span>
             </div>
           </a>
           <NotificationBell />

@@ -4,7 +4,6 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { UserAvatar } from "./user-avatar";
 import { DynamicBreadcrumb } from "@/hooks/dynamic-breadcrumb";
 
-
 export const BoardNavbar = () => {
   return (
     <header className="flex sticky top-0 bg-background h-14 shrink-0 items-center gap-2">
@@ -14,6 +13,7 @@ export const BoardNavbar = () => {
         <DynamicBreadcrumb />
         <div className="ml-auto flex items-center gap-2">
           <ModeToggle />
+          <Separator orientation="vertical" className="mr-2 h-4" />
           <UserAvatar />
         </div>
       </div>

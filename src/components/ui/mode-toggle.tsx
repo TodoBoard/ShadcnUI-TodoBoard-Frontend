@@ -10,6 +10,15 @@ export function ModeToggle() {
   const { theme, setTheme } = useTheme();
   const id = React.useId();
 
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   const handleChange = (checked: boolean) => {
     setTheme(checked ? "dark" : "light");
   };

@@ -57,6 +57,32 @@ const shareOptions = [
   { icon: Share2, label: "More", action: "share" },
 ];
 
+interface InviteLinkSettings {
+  maxUses: number;
+  expiresIn: number; // in hours
+}
+
+const defaultSettings: InviteLinkSettings = {
+  maxUses: 0, // 0 means unlimited
+  expiresIn: 168, // 7 days in hours
+};
+
+const expirationOptions = [
+  { value: 24, label: "24 hours" },
+  { value: 72, label: "3 days" },
+  { value: 168, label: "7 days" },
+  { value: 720, label: "30 days" },
+  { value: 0, label: "Never" },
+];
+
+const usageOptions = [
+  { value: 1, label: "1 use" },
+  { value: 5, label: "5 uses" },
+  { value: 10, label: "10 uses" },
+  { value: 25, label: "25 uses" },
+  { value: 0, label: "Unlimited" },
+];
+
 export function NavInvitePeopleDialog({
   triggerContent,
   shortcut,
@@ -65,7 +91,9 @@ export function NavInvitePeopleDialog({
   const [open, setOpen] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
+  const [settings, setSettings] = useState<InviteLinkSettings>(defaultSettings);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [inviteLink, setInviteLink] = useState<string>("");
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -83,12 +111,16 @@ export function NavInvitePeopleDialog({
     return () => document.removeEventListener("keydown", down);
   }, [shortcut]);
 
-  const getInviteLink = () => {
-    return selectedProject
-      ? `https://originui.com/invite/${selectedProject}/${Math.random()
-          .toString(36)
-          .substring(7)}`
-      : "";
+  const generateInviteLink = () => {
+    if (!selectedProject) return;
+    const params = new URLSearchParams({
+      maxUses: settings.maxUses.toString(),
+      expiresIn: settings.expiresIn.toString(),
+    });
+    const link = `https://originui.com/invite/${selectedProject}/${Math.random()
+      .toString(36)
+      .substring(7)}?${params.toString()}`;
+    setInviteLink(link);
   };
 
   const handleCopy = () => {
@@ -100,7 +132,7 @@ export function NavInvitePeopleDialog({
   };
 
   const handleShare = async (action: string) => {
-    const link = getInviteLink();
+    const link = inviteLink;
     if (!link) return;
 
     if (action === "share" && navigator.share) {
@@ -123,116 +155,173 @@ export function NavInvitePeopleDialog({
       <DialogTrigger asChild>
         <div onClick={() => setOpen(true)}>{triggerContent}</div>
       </DialogTrigger>
-      <DialogContent>
-        <div className="flex flex-col gap-2">
-          <div
-            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-primary"
-            aria-hidden="true"
-          >
-            <UserRoundPlus
-              className="text-primary-foreground"
-              size={16}
-              strokeWidth={2}
-            />
-          </div>
-          <DialogHeader>
-            <DialogTitle className="text-left">Invite team members</DialogTitle>
-            <DialogDescription className="text-left">
-              Share the invite link with your teammates
-            </DialogDescription>
-          </DialogHeader>
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="project-select">Select project</Label>
-            <Select value={selectedProject} onValueChange={setSelectedProject}>
-              <SelectTrigger id="project-select">
-                <SelectValue placeholder="Choose a project" />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map((project) => (
-                  <SelectItem key={project.id} value={project.id}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={id}>Invite link</Label>
-            <div className="relative">
-              <Input
-                ref={inputRef}
-                id={id}
-                className="pe-9"
-                type="text"
-                value={
-                  selectedProject
-                    ? getInviteLink()
-                    : "Please select a project first"
-                }
-                readOnly
+      <DialogContent className="sm:max-w-[500px]">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10"
+              aria-hidden="true"
+            >
+              <UserRoundPlus
+                className="text-primary"
+                size={20}
+                strokeWidth={2}
               />
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={handleCopy}
-                      className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg border border-transparent text-muted-foreground/80 outline-offset-2 transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed"
-                      aria-label={copied ? "Copied" : "Copy to clipboard"}
-                      disabled={!selectedProject || copied}
-                    >
-                      <div
-                        className={cn(
-                          "transition-all",
-                          copied ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                        )}
-                      >
-                        <Check
-                          className="stroke-emerald-500"
-                          size={16}
-                          strokeWidth={2}
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <div
-                        className={cn(
-                          "absolute transition-all",
-                          copied ? "scale-0 opacity-0" : "scale-100 opacity-100"
-                        )}
-                      >
-                        <Copy size={16} strokeWidth={2} aria-hidden="true" />
-                      </div>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="px-2 py-1 text-xs">
-                    Copy to clipboard
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
             </div>
+            <DialogHeader className="flex-1">
+              <DialogTitle>Invite team members</DialogTitle>
+              <DialogDescription>
+                Create and share an invite link with your teammates
+              </DialogDescription>
+            </DialogHeader>
           </div>
 
-          {selectedProject && (
+          <div className="space-y-6">
             <div className="space-y-2">
-              <Label>Share via</Label>
-              <div className="flex gap-2">
-                {shareOptions.map(({ icon: Icon, label, action }) => (
-                  <Button
-                    key={label}
-                    variant="default"
-                    className="flex-1 rounded-xl shadow-none"
-                    onClick={() => handleShare(action)}
-                  >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {label}
-                  </Button>
-                ))}
+              <Label htmlFor="project-select">Project</Label>
+              <Select
+                value={selectedProject}
+                onValueChange={setSelectedProject}
+              >
+                <SelectTrigger id="project-select">
+                  <SelectValue placeholder="Choose a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="expiration">Link expiration</Label>
+                <Select
+                  value={settings.expiresIn.toString()}
+                  onValueChange={(value) =>
+                    setSettings({ ...settings, expiresIn: Number(value) })
+                  }
+                >
+                  <SelectTrigger id="expiration">
+                    <SelectValue placeholder="Select expiration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {expirationOptions.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value.toString()}
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="usage">Maximum uses</Label>
+                <Select
+                  value={settings.maxUses.toString()}
+                  onValueChange={(value) =>
+                    setSettings({ ...settings, maxUses: Number(value) })
+                  }
+                >
+                  <SelectTrigger id="usage">
+                    <SelectValue placeholder="Select usage limit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {usageOptions.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value.toString()}
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          )}
+
+            <Button
+              onClick={generateInviteLink}
+              className="w-full"
+              disabled={!selectedProject}
+            >
+              <Link className="mr-2 h-4 w-4" />
+              Generate Invite Link
+            </Button>
+
+            {inviteLink && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor={id}>Invite link</Label>
+                  <div className="relative">
+                    <Input
+                      ref={inputRef}
+                      id={id}
+                      className="pe-9"
+                      type="text"
+                      value={inviteLink}
+                      readOnly
+                    />
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={handleCopy}
+                            className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center text-muted-foreground/80 transition-colors hover:text-foreground"
+                            disabled={copied}
+                          >
+                            {copied ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {copied ? "Copied!" : "Copy to clipboard"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {settings.expiresIn > 0 &&
+                      `This link will expire in ${
+                        settings.expiresIn === 24
+                          ? "24 hours"
+                          : `${settings.expiresIn / 24} days`
+                      }. `}
+                    {settings.maxUses > 0 &&
+                      `It can be used ${settings.maxUses} time${
+                        settings.maxUses === 1 ? "" : "s"
+                      }.`}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Share via</Label>
+                  <div className="flex gap-2">
+                    {shareOptions.map(({ icon: Icon, label, action }) => (
+                      <Button
+                        key={label}
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => handleShare(action)}
+                      >
+                        <Icon className="mr-2 h-4 w-4" />
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

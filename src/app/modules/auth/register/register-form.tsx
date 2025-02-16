@@ -2,21 +2,35 @@
 
 import { CalendarCheck2, Eye, EyeOff, Check, X } from "lucide-react";
 import { useState, useId, useMemo } from "react";
-
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Auth, handleApiError } from "@/lib/api";
+import type { RegisterFormData } from "@/models/auth";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const id = useId();
-  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [formData, setFormData] = useState<RegisterFormData>({
+    username: "",
+    password: "",
+  });
 
   const toggleVisibility = () => setIsVisible((prev) => !prev);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const checkStrength = (pass: string) => {
     const requirements = [
@@ -32,7 +46,7 @@ export function RegisterForm({
     }));
   };
 
-  const strength = checkStrength(password);
+  const strength = checkStrength(formData.password);
   const strengthScore = useMemo(() => {
     return strength.filter((req) => req.met).length;
   }, [strength]);
@@ -45,9 +59,31 @@ export function RegisterForm({
     return "bg-emerald-500";
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (strengthScore < 4) {
+      toast.error("Please meet all password requirements");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await Auth.register(formData);
+      toast.success("Registration successful!");
+
+      const redirectTo = searchParams.get("redirect") || "/board/home";
+      router.push(redirectTo);
+      router.refresh();
+    } catch (error: unknown) {
+      toast.error(handleApiError(error));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a
@@ -57,7 +93,7 @@ export function RegisterForm({
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <CalendarCheck2 className="size-6 text-primary" />
               </div>
-              <span className="sr-only">TodoApp</span>
+              <span className="sr-only">TodoBoard</span>
             </a>
             <h1 className="text-xl font-bold">Create your account</h1>
             <div className="text-center text-sm">
@@ -70,7 +106,15 @@ export function RegisterForm({
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" type="text" placeholder="johndoe" required />
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="johndoe"
+                value={formData.username}
+                onChange={handleInputChange}
+                required
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -79,11 +123,12 @@ export function RegisterForm({
               <div className="relative">
                 <Input
                   id={id}
+                  name="password"
                   className="pe-9"
                   placeholder="Enter your password"
                   type={isVisible ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleInputChange}
                   aria-invalid={strengthScore < 4}
                   required
                 />
@@ -132,8 +177,8 @@ export function RegisterForm({
                 ))}
               </ul>
             </div>
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </div>
         </div>

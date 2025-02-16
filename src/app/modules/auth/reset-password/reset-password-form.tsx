@@ -21,7 +21,7 @@ export function PasswordResetForm({
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <CalendarCheck2 className="size-6 text-primary" />
               </div>
-              <span className="sr-only">TodoApp</span>
+              <span className="sr-only">TodoBoard</span>
             </a>
             <h1 className="text-xl font-bold">Reset your password</h1>
             <div className="text-center text-sm">

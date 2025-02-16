@@ -1,6 +1,6 @@
 "use client";
 
-import { NoTasks } from "@/app/modules/board/ui/components/no-tasks";
+import { NoTasks } from "@/app/modules/board/projects/no-tasks";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Plus, Pencil } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import {
   Select,
@@ -49,10 +49,12 @@ function TaskItem({
   task,
   toggleTaskComplete,
   onEdit,
+  onDelete,
 }: {
   task: Task;
   toggleTaskComplete: (id: string) => void;
   onEdit: (task: Task) => void;
+  onDelete: (id: string) => void;
 }) {
   return (
     <div>
@@ -120,6 +122,12 @@ function TaskItem({
               onClick={() => onEdit(task)}
             >
               <Pencil className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+            </button>
+            <button
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={() => onDelete(task.id)}
+            >
+              <Trash2 className="w-3 h-3 text-gray-400 hover:text-gray-600" />
             </button>
           </div>
         </div>
@@ -217,7 +225,7 @@ export default function MyProjectsTravelPage() {
         completed: false,
         creator: {
           name: "You",
-          avatar: "/board/user/picture/4.png",
+          avatar: "/user/avatar/4.png",
         },
       };
       setTasks([...tasks, newTask]);
@@ -256,6 +264,10 @@ export default function MyProjectsTravelPage() {
     setIsFormVisible(true);
   };
 
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between">
@@ -263,28 +275,28 @@ export default function MyProjectsTravelPage() {
         <div className="flex -space-x-2">
           <img
             className="rounded-full ring-2 ring-background w-8 h-8"
-            src="/board/user/picture/1.png"
+            src="/user/avatar/1.png"
             width={32}
             height={32}
             alt="Collaborator 1"
           />
           <img
             className="rounded-full ring-2 ring-background w-8 h-8"
-            src="/board/user/picture/2.png"
+            src="/user/avatar/2.png"
             width={32}
             height={32}
             alt="Collaborator 2"
           />
           <img
             className="rounded-full ring-2 ring-background w-8 h-8"
-            src="/board/user/picture/3.png"
+            src="/user/avatar/3.png"
             width={32}
             height={32}
             alt="Collaborator 3"
           />
           <img
             className="rounded-full ring-2 ring-background w-8 h-8"
-            src="/board/user/picture/4.png"
+            src="/user/avatar/4.png"
             width={32}
             height={32}
             alt="Collaborator 4"
@@ -293,7 +305,6 @@ export default function MyProjectsTravelPage() {
       </div>
 
       <div className="mt-5 space-y-2">
-        {/* Active Tasks */}
         {tasks
           .filter((task) => !task.completed)
           .map((task) =>
@@ -537,6 +548,7 @@ export default function MyProjectsTravelPage() {
                 task={task}
                 toggleTaskComplete={toggleTaskComplete}
                 onEdit={handleEditTask}
+                onDelete={handleDeleteTask}
               />
             )
           )}
@@ -844,6 +856,7 @@ export default function MyProjectsTravelPage() {
                         task={task}
                         toggleTaskComplete={toggleTaskComplete}
                         onEdit={handleEditTask}
+                        onDelete={handleDeleteTask}
                       />
                     )
                   )}

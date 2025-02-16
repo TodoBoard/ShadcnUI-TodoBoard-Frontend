@@ -1,3 +1,4 @@
+import { Toaster } from "sonner";
 import { LoginForm } from "@/app/modules/auth/login/login-form";
 
 export default function LoginPage() {
