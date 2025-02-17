@@ -16,6 +16,7 @@ import { Projects } from "@/lib/api";
 import { ProjectListResponse } from "@/models/projects";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { handleApiError } from "@/lib/api";
+import { useNotificationsStore } from "@/store/notifications";
 
 import {
   Sidebar,
@@ -75,6 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
+  const { unreadCount, setUnreadCount } = useNotificationsStore();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -83,6 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       try {
         const data = await Projects.getProjects();
         setProjectData(data);
+        setUnreadCount(data.unread_notifications_count);
       } catch (error) {
         setError(true);
         const errorMessage = handleApiError(error);
@@ -93,7 +96,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     };
 
     fetchProjects();
-  }, []);
+  }, [setUnreadCount]);
 
   const navItemsWithActive = mainNavItems.map((item) => ({
     ...item,
@@ -107,9 +110,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       )}
       <Sidebar {...props}>
         <SidebarHeader>
-          <NavLogo
-            notificationCount={projectData?.unread_notifications_count ?? 0}
-          />
+          <NavLogo notificationCount={unreadCount} />
           <NavMain items={navItemsWithActive} />
         </SidebarHeader>
         <SidebarContent>

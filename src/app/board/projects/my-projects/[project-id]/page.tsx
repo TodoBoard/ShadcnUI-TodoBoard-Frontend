@@ -377,7 +377,7 @@ export default function MyProjectsPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-7 text-xs justify-start text-left font-normal"
+                            className="h-7 text-xs justify-start text-left font-normal shadow-none"
                           >
                             <CalendarIcon className="mr-1 h-3 w-3" />
                             {date ? (
@@ -466,7 +466,7 @@ export default function MyProjectsPage() {
                           setFormData({ ...formData, priority: value })
                         }
                       >
-                        <SelectTrigger className="h-7 w-[100px] text-xs">
+                        <SelectTrigger className="h-7 w-[100px] text-xs shadow-none">
                           <SelectValue placeholder="Priority">
                             {formData.priority && (
                               <div className="flex items-center">
@@ -526,15 +526,6 @@ export default function MyProjectsPage() {
                           </SelectItem>
                         </SelectContent>
                       </Select>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs"
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        More
-                      </Button>
                     </div>
                   </TaskCardContent>
                   <Separator className="my-2" />
@@ -667,7 +658,7 @@ export default function MyProjectsPage() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="h-7 text-xs justify-start text-left font-normal"
+                                    className="h-7 text-xs justify-start text-left font-normal shadow-none"
                                   >
                                     <CalendarIcon className="mr-1 h-3 w-3" />
                                     {date ? (
@@ -764,7 +755,7 @@ export default function MyProjectsPage() {
                                   setFormData({ ...formData, priority: value })
                                 }
                               >
-                                <SelectTrigger className="h-7 w-[100px] text-xs">
+                                <SelectTrigger className="h-7 w-[100px] text-xs shadow-none">
                                   <SelectValue placeholder="Priority">
                                     {formData.priority && (
                                       <div className="flex items-center">
@@ -830,15 +821,6 @@ export default function MyProjectsPage() {
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
-
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-7 text-xs"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                More
-                              </Button>
                             </div>
                           </TaskCardContent>
                           <Separator className="my-2" />
@@ -949,7 +931,7 @@ export default function MyProjectsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 text-xs justify-start text-left font-normal"
+                        className="h-7 text-xs justify-start text-left font-normal shadow-none"
                       >
                         <CalendarIcon className="mr-1 h-3 w-3" />
                         {date ? (
@@ -1038,7 +1020,7 @@ export default function MyProjectsPage() {
                       setFormData({ ...formData, priority: value })
                     }
                   >
-                    <SelectTrigger className="h-7 w-[100px] text-xs">
+                    <SelectTrigger className="h-7 w-[100px] text-xs shadow-none">
                       <SelectValue placeholder="Priority">
                         {formData.priority && (
                           <div className="flex items-center">
@@ -1088,11 +1070,6 @@ export default function MyProjectsPage() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-
-                  <Button variant="outline" size="sm" className="h-7 text-xs">
-                    <Plus className="h-3 w-3 mr-1" />
-                    More
-                  </Button>
                 </div>
               </TaskCardContent>
               <Separator className="my-2" />

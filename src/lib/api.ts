@@ -8,7 +8,7 @@ import {
 } from "@/models/auth";
 import { ProjectStatisticsResponse } from "@/models/stats";
 import { setAuthToken, clearAuthToken } from "@/lib/authHelpers";
-import { Notification } from "@/models/notifications";
+import { Notification, MarkAsReadResponse } from "@/models/notifications";
 import { ProjectListResponse } from "@/models/projects";
 import { TwoFactorStatus, TwoFactorSetupResponse } from "@/models/security";
 
@@ -107,9 +107,10 @@ export const Notifications = {
     }
   },
 
-  markAsRead: async (notificationId: string): Promise<void> => {
+  markAsRead: async (notificationId: string): Promise<MarkAsReadResponse> => {
     try {
-      await api.post(`/notifications/${notificationId}/read`);
+      const response = await api.post<MarkAsReadResponse>(`/notifications/${notificationId}/read`);
+      return response.data;
     } catch (error) {
       throw handleApiError(error);
     }

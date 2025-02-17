@@ -58,7 +58,7 @@ export const DynamicBreadcrumb = () => {
   };
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className="hidden md:flex">
       <BreadcrumbList>
         <BreadcrumbItem>
           {pathname === "/board" ? (
@@ -77,7 +77,7 @@ export const DynamicBreadcrumb = () => {
         </BreadcrumbItem>
 
         {segments.map((segment, index) => {
-          if (segment === "board" || segment === "projects") return null;
+          if (segment === "board" || segment === "projects" || segment === "home") return null;
           const path = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
 

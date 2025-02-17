@@ -4,16 +4,17 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, BellDot } from "lucide-react";
 import { useState } from "react";
-import { Header } from "@/app/modules/board/notifications/header";
 import { NotificationsList } from "@/app/modules/board/notifications/notifications";
 
 export default function NotificationsPage() {
   const [activeTab, setActiveTab] = useState("unread");
-  const [unreadCount, setUnreadCount] = useState(0);
 
   return (
     <div className="space-y-6 pb-4 pt-2">
-      <Header unreadCount={unreadCount} />
+      <div className="flex items-center justify-between">
+        <h1 className="font-bold text-2xl">Notifications</h1>
+      </div>
+      
       <Tabs
         defaultValue="unread"
         value={activeTab}
@@ -43,7 +44,7 @@ export default function NotificationsPage() {
           </TabsList>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
-        <NotificationsList onUnreadCountChange={setUnreadCount} />
+        <NotificationsList />
       </Tabs>
     </div>
   );

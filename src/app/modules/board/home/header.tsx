@@ -31,11 +31,10 @@ export function Header({ className }: HeaderProps) {
   };
 
   return (
-    <div className={`flex justify-between items-center ${className ?? ""}`}>
+    <div className={`flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center ${className ?? ""}`}>
       <h1 className="font-bold text-2xl">{renderWelcomeMessage()}</h1>
       <Button
-        className="flex items-center gap-2 shadow-none rounded-xl"
-        aria-label="Create new project"
+        className="w-full sm:w-auto flex items-center justify-center gap-2 shadow-none rounded-xl"
       >
         <PlusCircle className="h-4 w-4" />
         New Project

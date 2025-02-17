@@ -11,6 +11,7 @@ import { NoNotifications } from "./no-notifications";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { handleApiError } from "@/lib/api";
+import { useNotificationsStore } from "@/store/notifications";
 
 const SKELETON_COUNT = 3;
 
@@ -99,16 +100,13 @@ function NotificationList({
   );
 }
 
-interface NotificationsListProps {
-  onUnreadCountChange?: (count: number) => void;
-}
+interface NotificationsListProps {}
 
-export function NotificationsList({
-  onUnreadCountChange,
-}: NotificationsListProps) {
+export function NotificationsList() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { setUnreadCount } = useNotificationsStore();
 
   const unreadNotifications = notifications.filter((n) => !n.read);
   const readNotifications = notifications.filter((n) => n.read);
@@ -116,10 +114,6 @@ export function NotificationsList({
   useEffect(() => {
     loadNotifications();
   }, []);
-
-  useEffect(() => {
-    onUnreadCountChange?.(unreadNotifications.length);
-  }, [notifications, onUnreadCountChange]);
 
   const loadNotifications = async () => {
     try {
@@ -135,10 +129,11 @@ export function NotificationsList({
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await NotificationsApi.markAsRead(notificationId);
+      const response = await NotificationsApi.markAsRead(notificationId);
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
       );
+      setUnreadCount(response.unread_notifications_count);
       setError(null);
     } catch (error) {
       setError(handleApiError(error));

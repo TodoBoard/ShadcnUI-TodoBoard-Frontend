@@ -6,3 +6,8 @@ export interface Notification {
   read: boolean;
   project_id: string;
 }
+
+export interface MarkAsReadResponse {
+  message: string;
+  unread_notifications_count: number;
+}
