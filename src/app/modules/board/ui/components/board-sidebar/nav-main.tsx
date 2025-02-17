@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 import {
   Collapsible,
@@ -31,7 +32,7 @@ interface NavItem {
   shortcut?: string;
 }
 
-function LinkNavItem({ item }: { item: NavItem }) {
+function LinkNavItem({ item }: { item: NavItem & { url: string } }) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
@@ -40,7 +41,7 @@ function LinkNavItem({ item }: { item: NavItem }) {
           item.isActive ? "bg-sidebar-accent text-sidebar-primary" : undefined
         }
       >
-        <a href={item.url}>
+        <Link href={item.url}>
           {item.icon && (
             <item.icon
               className={`size-4 ${
@@ -55,7 +56,7 @@ function LinkNavItem({ item }: { item: NavItem }) {
               {item.shortcut.replace("⌘", "")}
             </kbd>
           )}
-        </a>
+        </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
@@ -117,9 +118,9 @@ function CollapsibleNavItem({ item }: { item: NavItem }) {
             {item.items?.map((subItem) => (
               <SidebarMenuSubItem key={subItem.title}>
                 <SidebarMenuSubButton asChild>
-                  <a href={subItem.url}>
+                  <Link href={subItem.url}>
                     <span>{subItem.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             ))}
@@ -142,7 +143,12 @@ export function NavMain({ items }: { items: NavItem[] }) {
             return <CollapsibleNavItem key={item.title} item={item} />;
           }
           if (item.url) {
-            return <LinkNavItem key={item.title} item={item} />;
+            return (
+              <LinkNavItem
+                key={item.title}
+                item={item as NavItem & { url: string }}
+              />
+            );
           }
           return null;
         })}

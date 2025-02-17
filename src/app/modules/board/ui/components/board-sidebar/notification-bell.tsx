@@ -3,12 +3,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
-import { useState } from "react";
 import Link from "next/link";
 
-export function NotificationBell() {
-  const [count] = useState(3);
+interface NotificationBellProps {
+  count: number;
+}
 
+export function NotificationBell({ count }: NotificationBellProps) {
   return (
     <Link href="/board/notifications">
       <Button

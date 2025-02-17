@@ -9,11 +9,11 @@ import { NotificationsList } from "@/app/modules/board/notifications/notificatio
 
 export default function NotificationsPage() {
   const [activeTab, setActiveTab] = useState("unread");
+  const [unreadCount, setUnreadCount] = useState(0);
 
   return (
     <div className="p-6">
-      <Header unreadCount={0} /> {/* TODO: get notifications */}
-
+      <Header unreadCount={unreadCount} />
       <div className="mt-6">
         <Tabs
           defaultValue="unread"
@@ -44,7 +44,7 @@ export default function NotificationsPage() {
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
-          <NotificationsList />
+          <NotificationsList onUnreadCountChange={setUnreadCount} />
         </Tabs>
       </div>
     </div>

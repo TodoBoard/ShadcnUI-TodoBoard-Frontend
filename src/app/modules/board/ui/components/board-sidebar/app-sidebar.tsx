@@ -2,16 +2,9 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import {
-  Frame,
-  Map,
-  PieChart,
-  Search,
-  CalendarCheck,
-  Home,
-  UserPlus,
-} from "lucide-react";
-
+import { Search, Home, UserPlus, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { formatProjects } from "@/utils/format-projects";
 import { NavMyProjects } from "./nav-my-projects";
 import { NavInvitedProjects } from "./nav-invited-projects";
 import { NavCreateProject } from "./nav-create-project";
@@ -19,6 +12,10 @@ import { NavLogo } from "./nav-logo";
 import { NavMain } from "./nav-main";
 import { NavInvitePeopleDialog } from "../board-dialog/invite-people-dialog";
 import { SearchDialog } from "../board-dialog/search-dialog";
+import { Projects } from "@/lib/api";
+import { ProjectListResponse } from "@/models/projects";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { handleApiError } from "@/lib/api";
 
 import {
   Sidebar,
@@ -26,38 +23,6 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  myProjects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "/board/projects/my-projects/travel",
-      icon: Map,
-    },
-  ],
-  invitedProjects: [
-    {
-      name: "Travel",
-      url: "/board/projects/invited-projects/travel",
-      icon: Map,
-    },
-  ],
-};
 
 const mainNavItems = [
   {
@@ -94,14 +59,41 @@ const mainNavItems = [
     },
   },
   {
-    title: "Today's Todos",
-    url: "/board/today",
-    icon: CalendarCheck,
+    title: "Settings",
+    url: "/board/settings",
+    icon: Settings,
   },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const [projectData, setProjectData] = useState<ProjectListResponse | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const data = await Projects.getProjects();
+        setProjectData(data);
+      } catch (error) {
+        setError(true);
+        const errorMessage = handleApiError(error);
+        setErrorMessage(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const navItemsWithActive = mainNavItems.map((item) => ({
     ...item,
@@ -109,18 +101,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }));
 
   return (
-    <Sidebar {...props}>
-      <SidebarHeader>
-        <NavLogo />
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={navItemsWithActive} />
-        <NavMyProjects projects={data.myProjects} />
-        <NavInvitedProjects projects={data.invitedProjects} />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavCreateProject />
-      </SidebarFooter>
-    </Sidebar>
+    <>
+      {(loading || error) && (
+        <LoadingOverlay error={error} errorMessage={errorMessage} />
+      )}
+      <Sidebar {...props}>
+        <SidebarHeader>
+          <NavLogo
+            notificationCount={projectData?.unread_notifications_count ?? 0}
+          />
+          <NavMain items={navItemsWithActive} />
+        </SidebarHeader>
+        <SidebarContent>
+          {!loading && (
+            <>
+              <NavMyProjects
+                projects={formatProjects(
+                  projectData?.my_projects || [],
+                  "my-projects",
+                  pathname
+                )}
+              />
+              <NavInvitedProjects
+                projects={formatProjects(
+                  projectData?.invited_projects || [],
+                  "invited-projects",
+                  pathname
+                )}
+              />
+            </>
+          )}
+        </SidebarContent>
+        <SidebarFooter>
+          <NavCreateProject />
+        </SidebarFooter>
+      </Sidebar>
+    </>
   );
 }

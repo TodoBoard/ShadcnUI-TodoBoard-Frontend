@@ -46,7 +46,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       router.push(redirectTo);
       router.refresh();
     } catch (error: unknown) {
-      toast.error(handleApiError(error));
+      toast.error(handleApiError(error, true));
     } finally {
       setIsLoading(false);
     }

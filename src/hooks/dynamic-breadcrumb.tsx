@@ -13,6 +13,17 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import React from "react";
 
+const decodeUrlSafeName = (segment: string) => {
+  if (segment.includes("-id=")) {
+    segment = segment.split("-id=")[0];
+  }
+  return segment
+    .replace(/-percent-/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
 export const DynamicBreadcrumb = () => {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
@@ -22,7 +33,17 @@ export const DynamicBreadcrumb = () => {
     path: string,
     isLast: boolean
   ) => {
-    const content = segment.charAt(0).toUpperCase() + segment.slice(1);
+    let content = segment;
+    if (segment.includes("-id=")) {
+      content = segment.split("-id=")[0];
+    }
+
+    content = decodeUrlSafeName(content);
+    content = content
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
     return (
       <BreadcrumbItem>
         {isLast ? (
@@ -56,7 +77,7 @@ export const DynamicBreadcrumb = () => {
         </BreadcrumbItem>
 
         {segments.map((segment, index) => {
-          if (segment === "board") return null;
+          if (segment === "board" || segment === "projects") return null;
           const path = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
 

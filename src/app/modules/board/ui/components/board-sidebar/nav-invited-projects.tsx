@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function NavInvitedProjects({
   projects,
@@ -38,6 +39,7 @@ export function NavInvitedProjects({
     name: string;
     url: string;
     icon: LucideIcon;
+    key: string;
   }[];
 }) {
   const { isMobile } = useSidebar();
@@ -75,9 +77,9 @@ export function NavInvitedProjects({
       {!isCollapsed && (
         <SidebarMenu>
           {projects.map((item) => (
-            <SidebarMenuItem key={item.name}>
+            <SidebarMenuItem key={item.key}>
               <SidebarMenuButton asChild>
-                <a
+                <Link
                   href={item.url}
                   className={cn({
                     "bg-sidebar-accent": pathname === item.url,
@@ -93,7 +95,7 @@ export function NavInvitedProjects({
                     })}
                   />
                   <span>{item.name}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

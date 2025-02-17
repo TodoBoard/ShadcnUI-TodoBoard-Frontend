@@ -14,9 +14,23 @@ import { Bell, Check, LogOut, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Auth } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export const UserAvatar = () => {
   const router = useRouter();
+  const [username, setUsername] = useState<string>("");
+  const [avatarId, setAvatarId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const storedAvatarId = localStorage.getItem("avatar_id");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+    if (storedAvatarId) {
+      setAvatarId(parseInt(storedAvatarId));
+    }
+  }, []);
 
   const handleLogout = () => {
     Auth.logout();
@@ -27,15 +41,22 @@ export const UserAvatar = () => {
     router.push("/board/notifications");
   };
 
-  const username = localStorage.getItem("username");
+  const handleSettingsClick = () => {
+    router.push("/board/settings");
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="relative cursor-pointer">
           <Avatar className="h-9 w-9">
-            <AvatarImage src="/user/avatar/4.png" alt="Kelly King" />
-            <AvatarFallback>KK</AvatarFallback>
+            {avatarId !== null && (
+              <AvatarImage
+                src={`/user/avatar/${avatarId}.png`}
+                alt="Unknown Avatar"
+              />
+            )}
+            <AvatarFallback>UK</AvatarFallback>
           </Avatar>
 
           <span className="absolute -end-0.5 -top-0.5">
@@ -68,8 +89,13 @@ export const UserAvatar = () => {
         <DropdownMenuLabel className="p-0">
           <div className="flex items-center space-x-2 p-2">
             <Avatar className="h-7 w-7">
-              <AvatarImage src="/user/avatar/4.png" alt="Kelly King" />
-              <AvatarFallback>KK</AvatarFallback>
+              {avatarId !== null && (
+                <AvatarImage
+                  src={`/user/avatar/${avatarId}.png`}
+                  alt="Unknown Avatar"
+                />
+              )}
+              <AvatarFallback>UK</AvatarFallback>
             </Avatar>
             <div className="flex flex-col space-y-0.5">
               <p className="text-sm font-medium leading-none">{username}</p>
@@ -89,7 +115,7 @@ export const UserAvatar = () => {
             <Bell className="mr-2 h-4 w-4" />
             <span>Notifications</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleSettingsClick}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>

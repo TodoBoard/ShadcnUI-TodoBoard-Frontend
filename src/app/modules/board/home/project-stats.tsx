@@ -10,6 +10,10 @@ import { useEffect, useState } from "react";
 import { Projects } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NoProjects } from "./no-projects";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { handleApiError } from "@/lib/api";
+
+const SKELETON_COUNT = 3;
 
 export function ProjectGrid({ projects }: { projects: Project[] }) {
   return (
@@ -70,67 +74,94 @@ export function ProjectGrid({ projects }: { projects: Project[] }) {
   );
 }
 
+function ProjectCardSkeleton() {
+  return (
+    <Card className="shadow-none">
+      <CardHeader>
+        <Skeleton className="h-7 w-48" />
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <Skeleton className="h-4 w-20 mb-1" />
+            <Skeleton className="h-8 w-12" />
+          </div>
+          <div>
+            <Skeleton className="h-4 w-20 mb-1" />
+            <Skeleton className="h-8 w-12" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+          <Skeleton className="h-2 w-full" />
+        </div>
+
+        <div>
+          <Skeleton className="h-4 w-16 mb-2" />
+          <div className="flex -space-x-2">
+            {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+              <Skeleton key={i} className="h-8 w-8 rounded-full" />
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ProjectGridSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {[1, 2, 3].map((index) => (
-        <Card key={index} className="shadow-none">
-          <CardHeader>
-            <Skeleton className="h-7 w-48" />
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <Skeleton className="h-4 w-20 mb-1" />
-                <Skeleton className="h-8 w-12" />
-              </div>
-              <div>
-                <Skeleton className="h-4 w-20 mb-1" />
-                <Skeleton className="h-8 w-12" />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-12" />
-              </div>
-              <Skeleton className="h-2 w-full" />
-            </div>
-
-            <div>
-              <Skeleton className="h-4 w-16 mb-2" />
-              <div className="flex -space-x-2">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-8 w-8 rounded-full" />
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+        <ProjectCardSkeleton key={index} />
       ))}
     </div>
   );
 }
 
 export function ProjectStats() {
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
   const [projectStats, setProjectStats] =
     useState<ProjectStatisticsResponse | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProjects = async () => {
       try {
         const data = await Projects.getStatistics();
-        setProjectStats(data);
-      } catch {
+        if (isMounted) {
+          setProjectStats(data);
+          setError(undefined);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setError(handleApiError(error));
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProjects();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  if (!projectStats) {
+  if (error) {
+    return <LoadingOverlay error={true} errorMessage={error} />;
+  }
+
+  if (!projectStats || isLoading) {
     return (
       <>
         <TabsContent value="my-projects">
@@ -143,6 +174,14 @@ export function ProjectStats() {
     );
   }
 
+  const renderProjects = (projects: Project[]) => {
+    return projects.length > 0 ? (
+      <ProjectGrid projects={projects} />
+    ) : (
+      <NoProjects />
+    );
+  };
+
   const hasNoProjects =
     projectStats.my_projects.length === 0 &&
     projectStats.invited_projects.length === 0;
@@ -154,19 +193,11 @@ export function ProjectStats() {
   return (
     <>
       <TabsContent value="my-projects">
-        {projectStats.my_projects.length > 0 ? (
-          <ProjectGrid projects={projectStats.my_projects} />
-        ) : (
-          <NoProjects />
-        )}
+        {renderProjects(projectStats.my_projects)}
       </TabsContent>
 
       <TabsContent value="invited-projects">
-        {projectStats.invited_projects.length > 0 ? (
-          <ProjectGrid projects={projectStats.invited_projects} />
-        ) : (
-          <NoProjects />
-        )}
+        {renderProjects(projectStats.invited_projects)}
       </TabsContent>
     </>
   );

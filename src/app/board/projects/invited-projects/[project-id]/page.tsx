@@ -164,7 +164,7 @@ function TaskItem({
   );
 }
 
-export default function MyProjectsPage() {
+export default function InvitedProjectsPage() {
   const today = new Date();
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string | null>(null);

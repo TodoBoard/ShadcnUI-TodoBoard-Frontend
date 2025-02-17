@@ -30,14 +30,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function NavMyProjects({
   projects,
 }: {
   projects: {
+    id: string;
     name: string;
     url: string;
     icon: LucideIcon;
+    team_members: { id: string; username: string; avatar_id: number }[];
+    key: string;
   }[];
 }) {
   const { isMobile } = useSidebar();
@@ -75,9 +79,9 @@ export function NavMyProjects({
       {!isCollapsed && (
         <SidebarMenu>
           {projects.map((item) => (
-            <SidebarMenuItem key={item.name}>
+            <SidebarMenuItem key={item.key}>
               <SidebarMenuButton asChild>
-                <a
+                <Link
                   href={item.url}
                   className={cn({
                     "bg-sidebar-accent": pathname === item.url,
@@ -93,7 +97,7 @@ export function NavMyProjects({
                     })}
                   />
                   <span>{item.name}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -107,10 +111,6 @@ export function NavMyProjects({
                   side={isMobile ? "bottom" : "right"}
                   align={isMobile ? "end" : "start"}
                 >
-                  <DropdownMenuItem>
-                    <Folder className="text-muted-foreground" />
-                    <span>View Project</span>
-                  </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Forward className="text-muted-foreground" />
                     <span>Share Project</span>

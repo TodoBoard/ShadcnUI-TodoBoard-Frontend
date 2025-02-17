@@ -6,7 +6,11 @@ import { NotificationBell } from "./notification-bell";
 
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
 
-export function NavLogo() {
+interface NavLogoProps {
+  notificationCount: number;
+}
+
+export function NavLogo({ notificationCount }: NavLogoProps) {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -19,7 +23,7 @@ export function NavLogo() {
               <span className="font-semibold text-md">TodoBoard</span>
             </div>
           </a>
-          <NotificationBell />
+          <NotificationBell count={notificationCount} />
         </div>
       </SidebarMenuItem>
     </SidebarMenu>
