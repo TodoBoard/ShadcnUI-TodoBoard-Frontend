@@ -2,10 +2,8 @@ import { Settings } from "@/app/modules/board/settings/settings";
 
 export default function SettingsPage() {
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-bold text-2xl">Settings</h1>
-      </div>
+    <div className="space-y-6 pb-4 pt-2">
+      <h1 className="font-bold text-2xl">Settings</h1>
       <Settings />
     </div>
   );

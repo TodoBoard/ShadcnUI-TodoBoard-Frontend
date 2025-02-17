@@ -303,7 +303,7 @@ export default function MyProjectsPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="space-y-6 pb-4 pt-2">
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">Travel</h1>
         <div className="flex -space-x-2">
@@ -338,7 +338,7 @@ export default function MyProjectsPage() {
         </div>
       </div>
 
-      <div className="mt-5 space-y-2">
+      <div className="space-y-2">
         {tasks
           .filter((task) => !task.completed)
           .map((task) =>

@@ -91,9 +91,9 @@ export default {
       },
       container: {
         center: true,
-        padding: "2rem",
+        padding: "1rem",
         screens: {
-          "2xl": "1100px",
+          "2xl": "1000px",
         },
       },
     },

@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 export function NoNotifications() {
   return (
-    <div className="flex flex-col items-center justify-center py-10 space-y-6">
+    <div className="flex flex-col items-center justify-center py-6 space-y-4">
       <div className="flex justify-center">
         <Image
           src="/board/nothing-to-do.png"
@@ -16,8 +16,8 @@ export function NoNotifications() {
         />
       </div>
       <div className="space-y-2 text-center">
-        <h3 className="text-2xl font-semibold">No Notifications Yet</h3>
-        <p className="text-muted-foreground">You're all caught up!</p>
+        <h3 className="text-xl font-semibold">No Notifications Yet</h3>
+        <p className="text-muted-foreground text-sm">You're all caught up!</p>
       </div>
       <Link href="/board">
         <Button size="lg" className="flex items-center gap-2 rounded-xl">

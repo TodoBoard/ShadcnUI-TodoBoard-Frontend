@@ -3,15 +3,33 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Security } from "@/lib/api";
+import { Security, handleApiError } from "@/lib/api";
 import { TwoFactorStatus } from "@/models/security";
 import { TwoFactorSetupDialog } from "@/app/modules/board/settings/two-factor-setup-dialog";
 import { TwoFactorDisableDialog } from "@/app/modules/board/settings/two-factor-disable-dialog";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function SettingsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-x-6">
+        <Skeleton className="h-20 w-20 rounded-full" />
+        <div className="space-y-1">
+          <Skeleton className="h-7 w-48" />
+          <Skeleton className="h-5 w-24" />
+        </div>
+        <Skeleton className="h-10 w-28 ml-auto" />
+      </div>
+    </div>
+  );
+}
 
 export function Settings() {
   const [twoFactorStatus, setTwoFactorStatus] =
     useState<TwoFactorStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [avatarId, setAvatarId] = useState<number | null>(null);
   const [showSetupDialog, setShowSetupDialog] = useState(false);
@@ -22,8 +40,9 @@ export function Settings() {
       try {
         const status = await Security.getTwoFactorStatus();
         setTwoFactorStatus(status);
+        setError(null);
       } catch (error) {
-        
+        setError(handleApiError(error));
       } finally {
         setIsLoading(false);
       }
@@ -98,6 +117,14 @@ export function Settings() {
       </Button>
     );
   };
+
+  if (error) {
+    return <LoadingOverlay error={true} errorMessage={error} />;
+  }
+
+  if (isLoading) {
+    return <SettingsSkeleton />;
+  }
 
   return (
     <div className="space-y-6">

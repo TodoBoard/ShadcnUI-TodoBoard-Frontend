@@ -5,7 +5,7 @@ import { Header } from "@/app/modules/board/home/header";
 
 export default function BoardHomePage() {
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-4 pt-2">
       <Header />
       <Tabs defaultValue="my-projects" className="w-full">
         <TabsList className="mb-4">

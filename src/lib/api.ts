@@ -29,15 +29,16 @@ api.interceptors.request.use((config) => {
 
 export const handleApiError = (
   error: unknown,
-  isAuth: boolean = false
+  isAuth: boolean = false,
+  isTwoFactor: boolean = false
 ): string => {
   if (axios.isAxiosError(error)) {
-    if (error.response?.status === 401 && !isAuth) {
+    if (error.response?.status === 401 && !isAuth && !isTwoFactor) {
       Auth.logout();
       window.location.href = "/auth/login";
     }
 
-    if (isAuth) {
+    if (isAuth || isTwoFactor) {
       return error.response?.data?.detail || "Authentication failed";
     }
 
@@ -138,7 +139,7 @@ export const Security = {
     try {
       await api.post("/2fa/enable", { totp_code: code });
     } catch (error) {
-      throw handleApiError(error);
+      throw handleApiError(error, false, true);
     }
   },
 
@@ -146,7 +147,7 @@ export const Security = {
     try {
       await api.post("/2fa/disable", { totp_code: code });
     } catch (error) {
-      throw handleApiError(error);
+      throw handleApiError(error, false, true);
     }
   },
 };
