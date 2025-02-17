@@ -1,22 +1,13 @@
 "use client";
 
 import {
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
   type LucideIcon,
   Plus,
   ChevronRight,
+  MoreHorizontal,
+  LogOut,
 } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -31,6 +22,12 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function NavInvitedProjects({
   projects,
@@ -50,29 +47,19 @@ export function NavInvitedProjects({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <div className="flex items-center justify-between px-2">
         <SidebarGroupLabel>Invited Projects</SidebarGroupLabel>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-muted-foreground hover:text-foreground"
-            aria-label="Add new project"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-muted-foreground hover:text-foreground"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            aria-label={isCollapsed ? "Expand" : "Collapse"}
-          >
-            <ChevronRight
-              className={cn("h-4 w-4 transition-transform", {
-                "rotate-90": !isCollapsed,
-              })}
-            />
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 text-muted-foreground hover:text-foreground"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? "Expand" : "Collapse"}
+        >
+          <ChevronRight
+            className={cn("h-4 w-4 transition-transform", {
+              "rotate-90": !isCollapsed,
+            })}
+          />
+        </Button>
       </div>
       {!isCollapsed && (
         <SidebarMenu>
@@ -110,17 +97,8 @@ export function NavInvitedProjects({
                   align={isMobile ? "end" : "start"}
                 >
                   <DropdownMenuItem>
-                    <Folder className="text-muted-foreground" />
-                    <span>View Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Forward className="text-muted-foreground" />
-                    <span>Share Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Trash2 className="text-muted-foreground" />
-                    <span>Delete Project</span>
+                    <LogOut className="text-muted-foreground" />
+                    <span>Leave Project</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

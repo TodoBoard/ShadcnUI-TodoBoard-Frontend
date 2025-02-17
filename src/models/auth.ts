@@ -32,3 +32,21 @@ export interface PasswordResetFormData {
 export interface PasswordResetResponse {
   detail: string;
 }
+
+export interface PasswordResetCheckResponse {
+  message: string;
+}
+
+export interface PasswordResetCheckData {
+  username: string;
+}
+
+export interface PasswordResetConfirmData {
+  username: string;
+  totp_code: string;
+  new_password: string;
+}
+
+export interface PasswordResetConfirmResponse {
+  message: string;
+}

@@ -8,6 +8,7 @@ import {
   type LucideIcon,
   Plus,
   ChevronRight,
+  Pencil,
 } from "lucide-react";
 
 import {
@@ -114,6 +115,10 @@ export function NavMyProjects({
                   <DropdownMenuItem>
                     <Forward className="text-muted-foreground" />
                     <span>Share Project</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Pencil className="text-muted-foreground" />
+                    <span>Rename Project</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>

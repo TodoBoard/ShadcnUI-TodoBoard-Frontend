@@ -1,19 +1,24 @@
 import axios from "axios";
-import { env } from "@/config/env";
+import { clientEnv } from "@/config/env";
 import {
   LoginFormData,
   LoginResponse,
   RegisterFormData,
   RegisterResponse,
+  PasswordResetCheckResponse,
+  PasswordResetCheckData,
+  PasswordResetConfirmData,
+  PasswordResetConfirmResponse,
 } from "@/models/auth";
 import { ProjectStatisticsResponse } from "@/models/stats";
 import { setAuthToken, clearAuthToken } from "@/lib/authHelpers";
 import { Notification, MarkAsReadResponse } from "@/models/notifications";
 import { ProjectListResponse } from "@/models/projects";
 import { TwoFactorStatus, TwoFactorSetupResponse } from "@/models/security";
+import { InviteCreate, InviteResponse } from "@/models/invites";
 
 const api = axios.create({
-  baseURL: env.apiUrl,
+  baseURL: clientEnv.apiUrl,
   headers: {
     "Content-Type": "application/json",
   },
@@ -38,7 +43,7 @@ export const handleApiError = (
       window.location.href = "/auth/login";
     }
 
-    if (isAuth || isTwoFactor) {
+    if (isAuth || isTwoFactor || error.response?.status === 400) {
       return error.response?.data?.detail || "Authentication failed";
     }
 
@@ -73,6 +78,35 @@ export const Auth = {
   logout: (): void => {
     clearAuthToken();
   },
+
+  checkPasswordReset: async (
+    username: string
+  ): Promise<PasswordResetCheckResponse> => {
+    try {
+      const data: PasswordResetCheckData = { username };
+      const response = await api.post<PasswordResetCheckResponse>(
+        "/password-reset/check",
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error, true);
+    }
+  },
+
+  confirmPasswordReset: async (
+    data: PasswordResetConfirmData
+  ): Promise<PasswordResetConfirmResponse> => {
+    try {
+      const response = await api.post<PasswordResetConfirmResponse>(
+        "/password-reset/confirm",
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error, true);
+    }
+  },
 };
 
 export const Projects = {
@@ -95,6 +129,21 @@ export const Projects = {
       throw handleApiError(error);
     }
   },
+
+  createInvite: async (
+    projectId: string,
+    data: InviteCreate
+  ): Promise<InviteResponse> => {
+    try {
+      const response = await api.post<InviteResponse>(
+        `/project/${projectId}/invite`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };
 
 export const Notifications = {
@@ -109,7 +158,9 @@ export const Notifications = {
 
   markAsRead: async (notificationId: string): Promise<MarkAsReadResponse> => {
     try {
-      const response = await api.post<MarkAsReadResponse>(`/notifications/${notificationId}/read`);
+      const response = await api.post<MarkAsReadResponse>(
+        `/notifications/${notificationId}/read`
+      );
       return response.data;
     } catch (error) {
       throw handleApiError(error);

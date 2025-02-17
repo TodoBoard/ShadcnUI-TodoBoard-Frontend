@@ -3,7 +3,7 @@
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import { Search, Home, UserPlus, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { formatProjects } from "@/utils/format-projects";
 import { NavMyProjects } from "./nav-my-projects";
 import { NavInvitedProjects } from "./nav-invited-projects";
@@ -12,11 +12,9 @@ import { NavLogo } from "./nav-logo";
 import { NavMain } from "./nav-main";
 import { NavInvitePeopleDialog } from "../board-dialog/invite-people-dialog";
 import { SearchDialog } from "../board-dialog/search-dialog";
-import { Projects } from "@/lib/api";
-import { ProjectListResponse } from "@/models/projects";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { handleApiError } from "@/lib/api";
 import { useNotificationsStore } from "@/store/notifications";
+import { useProjectsStore } from "@/store/projects";
 
 import {
   Sidebar,
@@ -25,7 +23,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
-const mainNavItems = [
+const mainNavItems = [//TODO
   {
     title: "Search",
     dialog: true,
@@ -68,35 +66,26 @@ const mainNavItems = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  const [projectData, setProjectData] = useState<ProjectListResponse | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
+  const {
+    loading,
+    error,
+    errorMessage,
+    myProjects,
+    invitedProjects,
+    fetchProjects,
+  } = useProjectsStore();
   const { unreadCount, setUnreadCount } = useNotificationsStore();
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      setError(false);
-      try {
-        const data = await Projects.getProjects();
-        setProjectData(data);
-        setUnreadCount(data.unread_notifications_count);
-      } catch (error) {
-        setError(true);
-        const errorMessage = handleApiError(error);
-        setErrorMessage(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+    const fetch = async () => {
+      await fetchProjects();
+      // Hier müssen wir die notifications count anders bekommen
+      // Entweder über einen separaten API call oder der Projects endpoint
+      // muss die count weiterhin zurückgeben
     };
 
-    fetchProjects();
-  }, [setUnreadCount]);
+    fetch();
+  }, [fetchProjects]);
 
   const navItemsWithActive = mainNavItems.map((item) => ({
     ...item,
@@ -117,15 +106,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {!loading && (
             <>
               <NavMyProjects
-                projects={formatProjects(
-                  projectData?.my_projects || [],
-                  "my-projects",
-                  pathname
-                )}
+                projects={formatProjects(myProjects, "my-projects", pathname)}
               />
               <NavInvitedProjects
                 projects={formatProjects(
-                  projectData?.invited_projects || [],
+                  invitedProjects,
                   "invited-projects",
                   pathname
                 )}

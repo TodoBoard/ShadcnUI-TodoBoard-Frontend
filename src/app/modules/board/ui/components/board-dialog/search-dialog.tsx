@@ -1,15 +1,8 @@
-"use client";
+"use client"; //TODO
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { 
-  Folder, 
-  Search, 
-  Home,
-  Settings,
-  UserPlus,
-  Bell
-} from "lucide-react";
+import { Folder, Search, Home, Settings, UserPlus, Bell } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -19,10 +12,10 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { Projects } from "@/lib/api";
-import { ProjectListResponse } from "@/models/projects";
 import { formatProjects } from "@/utils/format-projects";
 import { mainNavItems } from "@/config/navigation";
+import { useProjectsStore } from "@/store/projects";
+import { DialogTitle } from "@/components/ui/dialog";
 
 interface SearchDialogProps {
   triggerContent: React.ReactNode;
@@ -32,15 +25,8 @@ interface SearchDialogProps {
 export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [projects, setProjects] = React.useState<ProjectListResponse | null>(null);
+  const { myProjects, invitedProjects, loading } = useProjectsStore();
   const router = useRouter();
-
-  // Fetch projects when dialog opens
-  React.useEffect(() => {
-    if (open) {
-      Projects.getProjects().then(setProjects);
-    }
-  }, [open]);
 
   // Keyboard shortcut handler
   React.useEffect(() => {
@@ -59,24 +45,25 @@ export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
     return () => document.removeEventListener("keydown", down);
   }, [shortcut]);
 
-  // Format projects for search
-  const myProjects = formatProjects(projects?.my_projects || [], "my-projects");
-  const invitedProjects = formatProjects(
-    projects?.invited_projects || [],
-    "invited-projects"
+  // Format and filter projects
+  const searchTerm = searchQuery.toLowerCase().trim();
+
+  const filteredNavigation = mainNavItems.filter((item) =>
+    item.title.toLowerCase().includes(searchTerm)
   );
 
-  // Filter items based on search query
-  const filteredNavigation = mainNavItems.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredMyProjects = formatProjects(
+    myProjects.filter((project) =>
+      project.name.toLowerCase().includes(searchTerm)
+    ),
+    "my-projects"
   );
-  
-  const filteredMyProjects = myProjects.filter((project) =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredInvitedProjects = invitedProjects.filter((project) =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase())
+
+  const filteredInvitedProjects = formatProjects(
+    invitedProjects.filter((project) =>
+      project.name.toLowerCase().includes(searchTerm)
+    ),
+    "invited-projects"
   );
 
   const handleSelect = (url: string | undefined) => {
@@ -86,72 +73,100 @@ export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
     }
   };
 
-  const hasResults = 
-    filteredNavigation.length > 0 || 
-    filteredMyProjects.length > 0 || 
+  const hasResults =
+    filteredNavigation.length > 0 ||
+    filteredMyProjects.length > 0 ||
     filteredInvitedProjects.length > 0;
 
   return (
     <>
       <div onClick={() => setOpen(true)}>{triggerContent}</div>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput 
-          placeholder="Search navigation and projects..." 
+        <DialogTitle className="sr-only">Search</DialogTitle>
+        <CommandInput
+          placeholder="Type to search..."
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
         <CommandList>
-          {!hasResults && <CommandEmpty>No results found.</CommandEmpty>}
-          
-          {filteredNavigation.length > 0 && (
-            <CommandGroup heading="Navigation">
-              {filteredNavigation.map((item) => (
-                <CommandItem
-                  key={item.title}
-                  onSelect={() => handleSelect(item.url)}
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  <span>{item.title}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
+          {loading ? (
+            <CommandEmpty>Loading results...</CommandEmpty>
+          ) : !hasResults && searchQuery ? (
+            <CommandEmpty>
+              No matches found for &quot;{searchQuery}&quot;
+              <br />
+              Try searching for something else
+            </CommandEmpty>
+          ) : (
+            <>
+              <CommandGroup heading="Navigation">
+                {(searchQuery ? filteredNavigation : mainNavItems).map(
+                  (item) => (
+                    <CommandItem
+                      key={item.title}
+                      onSelect={() => handleSelect(item.url)}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{item.title}</span>
+                    </CommandItem>
+                  )
+                )}
+              </CommandGroup>
 
-          {filteredNavigation.length > 0 && 
-           (filteredMyProjects.length > 0 || filteredInvitedProjects.length > 0) && (
-            <CommandSeparator />
-          )}
+              {(filteredMyProjects.length > 0 ||
+                filteredInvitedProjects.length > 0) && <CommandSeparator />}
 
-          {filteredMyProjects.length > 0 && (
-            <CommandGroup heading="My Projects">
-              {filteredMyProjects.map((project) => (
-                <CommandItem
-                  key={project.key}
-                  onSelect={() => handleSelect(project.url)}
-                >
-                  <Folder className="mr-2 h-4 w-4" />
-                  <span>{project.name}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
+              {(searchQuery
+                ? filteredMyProjects
+                : formatProjects(myProjects, "my-projects")
+              ).length > 0 && (
+                <CommandGroup heading="My Projects">
+                  {(searchQuery
+                    ? filteredMyProjects
+                    : formatProjects(myProjects, "my-projects")
+                  ).map((project) => (
+                    <CommandItem
+                      key={project.key}
+                      value={`my-${project.key}`}
+                      onSelect={() => handleSelect(project.url)}
+                    >
+                      <Folder className="mr-2 h-4 w-4" />
+                      <span>{project.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
 
-          {filteredMyProjects.length > 0 && filteredInvitedProjects.length > 0 && (
-            <CommandSeparator />
-          )}
+              {(searchQuery
+                ? filteredMyProjects
+                : formatProjects(myProjects, "my-projects")
+              ).length > 0 &&
+                (searchQuery
+                  ? filteredInvitedProjects
+                  : formatProjects(invitedProjects, "invited-projects")
+                ).length > 0 && <CommandSeparator />}
 
-          {filteredInvitedProjects.length > 0 && (
-            <CommandGroup heading="Invited Projects">
-              {filteredInvitedProjects.map((project) => (
-                <CommandItem
-                  key={project.key}
-                  onSelect={() => handleSelect(project.url)}
-                >
-                  <Folder className="mr-2 h-4 w-4" />
-                  <span>{project.name}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
+              {(searchQuery
+                ? filteredInvitedProjects
+                : formatProjects(invitedProjects, "invited-projects")
+              ).length > 0 && (
+                <CommandGroup heading="Invited Projects">
+                  {(searchQuery
+                    ? filteredInvitedProjects
+                    : formatProjects(invitedProjects, "invited-projects")
+                  ).map((project) => (
+                    <CommandItem
+                      key={project.key}
+                      value={`invited-${project.key}`}
+                      onSelect={() => handleSelect(project.url)}
+                    >
+                      <Folder className="mr-2 h-4 w-4" />
+                      <span>{project.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </>
           )}
         </CommandList>
       </CommandDialog>

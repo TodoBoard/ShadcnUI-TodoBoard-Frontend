@@ -1,13 +1,5 @@
-import { 
-  Home,
-  Bell,
-  UserPlus,
-  Settings,
-  Search,
-  type LucideIcon
-} from "lucide-react";
+import { Home, Bell, UserPlus, Settings, type LucideIcon } from "lucide-react";//TODO
 import * as React from "react";
-import { SearchDialog } from "@/app/modules/board/ui/components/board-dialog/search-dialog";
 import { NavInvitePeopleDialog } from "@/app/modules/board/ui/components/board-dialog/invite-people-dialog";
 
 export interface NavigationItem {
@@ -21,38 +13,29 @@ export interface NavigationItem {
 
 export const mainNavItems: NavigationItem[] = [
   {
-    title: "Search",
-    icon: Search,
-    shortcut: "K",
-    dialog: true,
-    dialogComponent: (trigger: React.ReactNode) => React.createElement(SearchDialog, {
-      triggerContent: trigger,
-      shortcut: "K"
-    })
-  },
-  {
     title: "Home",
     icon: Home,
-    url: "/board/home"
+    url: "/board/home",
   },
   {
     title: "Notifications",
     icon: Bell,
-    url: "/board/notifications"
+    url: "/board/notifications",
   },
   {
     title: "Invite People",
     icon: UserPlus,
     shortcut: "I",
     dialog: true,
-    dialogComponent: (trigger: React.ReactNode) => React.createElement(NavInvitePeopleDialog, {
-      triggerContent: trigger,
-      shortcut: "I"
-    })
+    dialogComponent: (trigger: React.ReactNode) =>
+      React.createElement(NavInvitePeopleDialog, {
+        triggerContent: trigger,
+        shortcut: "I",
+      }),
   },
   {
     title: "Settings",
     icon: Settings,
-    url: "/board/settings"
-  }
-]; 
+    url: "/board/settings",
+  },
+];
