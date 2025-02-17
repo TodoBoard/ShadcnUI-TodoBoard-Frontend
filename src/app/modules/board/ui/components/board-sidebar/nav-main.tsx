@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -17,19 +17,14 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { mainNavItems, type NavigationItem } from "@/config/navigation";
 
-interface NavItem {
-  title: string;
-  url?: string;
-  icon?: LucideIcon;
+interface NavItem extends NavigationItem {
   isActive?: boolean;
   items?: {
     title: string;
     url: string;
   }[];
-  dialog?: boolean;
-  dialogComponent?: (trigger: React.ReactNode) => React.ReactElement;
-  shortcut?: string;
 }
 
 function LinkNavItem({ item }: { item: NavItem & { url: string } }) {
@@ -131,7 +126,7 @@ function CollapsibleNavItem({ item }: { item: NavItem }) {
   );
 }
 
-export function NavMain({ items }: { items: NavItem[] }) {
+export function NavMain({ items = mainNavItems }: { items?: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarMenu>

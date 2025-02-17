@@ -10,8 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, Check, LogOut, Settings } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Bell, LogOut, Settings } from "lucide-react";
 import { Auth } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -85,10 +84,10 @@ export const UserAvatar = () => {
         </div>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-40" align="end" forceMount>
-        <DropdownMenuLabel className="p-0">
-          <div className="flex items-center space-x-2 p-2">
-            <Avatar className="h-7 w-7">
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
               {avatarId !== null && (
                 <AvatarImage
                   src={`/user/avatar/${avatarId}.png`}
@@ -97,33 +96,33 @@ export const UserAvatar = () => {
               )}
               <AvatarFallback>UK</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col space-y-0.5">
-              <p className="text-sm font-medium leading-none">{username}</p>
-              <Badge
-                variant="secondary"
-                className="w-fit text-[10px] font-normal px-1 py-0 h-4"
-              >
-                <Check className="mr-0.5 h-2.5 w-2.5 text-emerald-500" />
-                2FA
-              </Badge>
-            </div>
+            <p className="text-sm font-medium">{username}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={handleNotificationsClick}>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notifications</span>
+          <DropdownMenuItem onClick={handleNotificationsClick} className="gap-3 cursor-pointer">
+            <Bell className="h-4 w-4" />
+            <div className="flex flex-col space-y-1 leading-none">
+              <p>Notifications</p>
+            </div>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleSettingsClick}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+          <DropdownMenuItem onClick={handleSettingsClick} className="gap-3 cursor-pointer">
+            <Settings className="h-4 w-4" />
+            <div className="flex flex-col space-y-1 leading-none">
+              <p>Settings</p>
+            </div>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign out</span>
+        <DropdownMenuItem 
+          onClick={handleLogout} 
+          className="text-red-600 gap-3 cursor-pointer focus:text-red-600 focus:bg-red-50"
+        >
+          <LogOut className="h-4 w-4" />
+          <div className="flex flex-col space-y-1 leading-none">
+            <p>Sign out</p>
+          </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

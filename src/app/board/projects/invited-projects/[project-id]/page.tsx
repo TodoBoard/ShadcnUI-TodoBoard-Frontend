@@ -302,6 +302,15 @@ export default function InvitedProjectsPage() {
     setTimeout(() => titleInputRef.current?.focus(), 0);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (formData.title.trim()) {
+        handleSubmit(e as any);
+      }
+    }
+  };
+
   return (
     <div className="space-y-6 pb-4 pt-2">
       <div className="flex items-center justify-between">
@@ -353,6 +362,7 @@ export default function InvitedProjectsPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, title: e.target.value })
                       }
+                      onKeyDown={handleKeyDown}
                       className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
                       required
                     />
@@ -634,6 +644,7 @@ export default function InvitedProjectsPage() {
                                   title: e.target.value,
                                 })
                               }
+                              onKeyDown={handleKeyDown}
                               className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
                               required
                             />
@@ -910,6 +921,7 @@ export default function InvitedProjectsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
                   }
+                  onKeyDown={handleKeyDown}
                   className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
                   required
                 />

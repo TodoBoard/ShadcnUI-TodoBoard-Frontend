@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import {
-  Calculator,
-  Calendar,
-  CreditCard,
+import { useRouter } from "next/navigation";
+import { 
+  Folder, 
+  Search, 
+  Home,
   Settings,
-  Smile,
-  User,
+  UserPlus,
+  Bell
 } from "lucide-react";
 import {
   CommandDialog,
@@ -17,8 +18,11 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
+import { Projects } from "@/lib/api";
+import { ProjectListResponse } from "@/models/projects";
+import { formatProjects } from "@/utils/format-projects";
+import { mainNavItems } from "@/config/navigation";
 
 interface SearchDialogProps {
   triggerContent: React.ReactNode;
@@ -27,7 +31,18 @@ interface SearchDialogProps {
 
 export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
   const [open, setOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [projects, setProjects] = React.useState<ProjectListResponse | null>(null);
+  const router = useRouter();
 
+  // Fetch projects when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      Projects.getProjects().then(setProjects);
+    }
+  }, [open]);
+
+  // Keyboard shortcut handler
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
@@ -44,42 +59,100 @@ export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
     return () => document.removeEventListener("keydown", down);
   }, [shortcut]);
 
+  // Format projects for search
+  const myProjects = formatProjects(projects?.my_projects || [], "my-projects");
+  const invitedProjects = formatProjects(
+    projects?.invited_projects || [],
+    "invited-projects"
+  );
+
+  // Filter items based on search query
+  const filteredNavigation = mainNavItems.filter((item) =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredMyProjects = myProjects.filter((project) =>
+    project.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredInvitedProjects = invitedProjects.filter((project) =>
+    project.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSelect = (url: string | undefined) => {
+    if (url) {
+      router.push(url);
+      setOpen(false);
+    }
+  };
+
+  const hasResults = 
+    filteredNavigation.length > 0 || 
+    filteredMyProjects.length > 0 || 
+    filteredInvitedProjects.length > 0;
+
   return (
     <>
       <div onClick={() => setOpen(true)}>{triggerContent}</div>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput 
+          placeholder="Search navigation and projects..." 
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            <CommandItem>
-              <Calendar className="mr-2 h-4 w-4" />
-              <span>Calendar</span>
-            </CommandItem>
-            <CommandItem>
-              <Smile className="mr-2 h-4 w-4" />
-              <span>Search Emoji</span>
-            </CommandItem>
-            <CommandItem>
-              <Calculator className="mr-2 h-4 w-4" />
-              <span>Calculator</span>
-            </CommandItem>
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Settings">
-            <CommandItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </CommandItem>
-            <CommandItem>
-              <CreditCard className="mr-2 h-4 w-4" />
-              <span>Billing</span>
-            </CommandItem>
-            <CommandItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </CommandItem>
-          </CommandGroup>
+          {!hasResults && <CommandEmpty>No results found.</CommandEmpty>}
+          
+          {filteredNavigation.length > 0 && (
+            <CommandGroup heading="Navigation">
+              {filteredNavigation.map((item) => (
+                <CommandItem
+                  key={item.title}
+                  onSelect={() => handleSelect(item.url)}
+                >
+                  <item.icon className="mr-2 h-4 w-4" />
+                  <span>{item.title}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+
+          {filteredNavigation.length > 0 && 
+           (filteredMyProjects.length > 0 || filteredInvitedProjects.length > 0) && (
+            <CommandSeparator />
+          )}
+
+          {filteredMyProjects.length > 0 && (
+            <CommandGroup heading="My Projects">
+              {filteredMyProjects.map((project) => (
+                <CommandItem
+                  key={project.key}
+                  onSelect={() => handleSelect(project.url)}
+                >
+                  <Folder className="mr-2 h-4 w-4" />
+                  <span>{project.name}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+
+          {filteredMyProjects.length > 0 && filteredInvitedProjects.length > 0 && (
+            <CommandSeparator />
+          )}
+
+          {filteredInvitedProjects.length > 0 && (
+            <CommandGroup heading="Invited Projects">
+              {filteredInvitedProjects.map((project) => (
+                <CommandItem
+                  key={project.key}
+                  onSelect={() => handleSelect(project.url)}
+                >
+                  <Folder className="mr-2 h-4 w-4" />
+                  <span>{project.name}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </CommandList>
       </CommandDialog>
     </>
