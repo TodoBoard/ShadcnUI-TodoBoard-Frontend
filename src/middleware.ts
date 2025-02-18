@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { env } from "@/config/env";
 
-const PROTECTED_PATHS = ["/board"] as const;
+const PROTECTED_PATHS = ["/board", "/invite"] as const;
 const AUTH_PATHS = ["/auth/login", "/auth/register"] as const;
 
 interface JWTPayload {

@@ -65,7 +65,14 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
           <h1 className="text-xl font-bold">Welcome to TodoBoard</h1>
           <p className="text-center text-sm">
             Don&apos;t have an account?{" "}
-            <a href="/auth/register" className="underline underline-offset-4">
+            <a
+              href={`/auth/register${
+                searchParams.get("redirect")
+                  ? `?redirect=${searchParams.get("redirect")}`
+                  : ""
+              }`}
+              className="underline underline-offset-4"
+            >
               Sign up
             </a>
           </p>
