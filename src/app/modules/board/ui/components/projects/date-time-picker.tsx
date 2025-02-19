@@ -103,9 +103,7 @@ export function DateTimePicker({
             <Calendar
               mode="single"
               selected={date}
-              onSelect={(newDate) => {
-                onDateChange(newDate);
-              }}
+              onSelect={onDateChange}
               className="p-2 sm:pe-5"
               disabled={[{ before: today }]}
               initialFocus
@@ -120,20 +118,48 @@ export function DateTimePicker({
                       </p>
                     </div>
                     <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
-                      {timeSlots.map(({ time: timeSlot, available }) => (
-                        <Button
-                          key={timeSlot}
-                          variant={time === timeSlot ? "default" : "outline"}
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            onTimeChange(timeSlot);
-                          }}
-                          disabled={!available}
-                        >
-                          {timeSlot}
-                        </Button>
-                      ))}
+                      {timeSlots.map(({ time: timeSlot, available }) => {
+                        let disabled = false;
+                        if (
+                          date &&
+                          format(date, "yyyy-MM-dd") ===
+                            format(today, "yyyy-MM-dd")
+                        ) {
+                          const [currentHour, currentMinute] = format(
+                            today,
+                            "HH:mm"
+                          )
+                            .split(":")
+                            .map(Number);
+                          const [slotHour, slotMinute] = timeSlot
+                            .split(":")
+                            .map(Number);
+                          if (
+                            slotHour < currentHour ||
+                            (slotHour === currentHour &&
+                              slotMinute < currentMinute)
+                          ) {
+                            disabled = true;
+                          }
+                        }
+                        return (
+                          <Button
+                            key={timeSlot}
+                            variant={time === timeSlot ? "default" : "outline"}
+                            size="sm"
+                            className={cn(
+                              "w-full",
+                              disabled && "opacity-50 cursor-not-allowed"
+                            )}
+                            onClick={() => {
+                              onTimeChange(timeSlot);
+                            }}
+                            disabled={!available || disabled}
+                          >
+                            {timeSlot}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </div>
                 </ScrollArea>

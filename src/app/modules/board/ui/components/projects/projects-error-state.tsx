@@ -1,30 +1,33 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { Home } from "lucide-react";
+import Link from "next/link";
 
-export function NoTasks() {
+interface ErrorStateProps {
+  title: string;
+  message?: string;
+}
+
+export function ErrorState({ title, message }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-6 space-y-4">
       <div className="flex justify-center">
         <Image
           src="/board/nothing-to-do.png"
-          alt="No tasks"
+          alt="Error occurred"
           width={300}
           height={300}
           className="opacity-90"
         />
       </div>
       <div className="space-y-2 text-center">
-        <h3 className="text-xl font-semibold">No Tasks Yet</h3>
-        <p className="text-muted-foreground text-sm">
-          Enjoy your free time!
-        </p>
+        <h3 className="text-xl font-semibold">{title}</h3>
+        {message && <p className="text-muted-foreground text-sm">{message}</p>}
       </div>
-      <Link href="/board/projects/new">
+      <Link href="/board/home">
         <Button size="lg" className="flex items-center gap-2 rounded-xl">
-          <PlusCircle className="w-4 h-4" />
-          Create Your First Task
+          <Home className="w-4 h-4" />
+          Back to Home
         </Button>
       </Link>
     </div>

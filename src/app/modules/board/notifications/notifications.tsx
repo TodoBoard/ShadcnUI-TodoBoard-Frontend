@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Notification } from "@/models/notifications";
 import { Notifications as NotificationsApi } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
-import { Check } from "lucide-react";
+import { CalendarCheck2, Check } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
 import { NoNotifications } from "./no-notifications";
@@ -43,12 +43,8 @@ function NotificationItem({
   return (
     <div className="py-4">
       <div className="flex items-start gap-4">
-        <div className="w-8 h-8">
-          <img
-            src={`/user/avatar/1.png`}
-            alt="User"
-            className="w-full h-full rounded-full"
-          />
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+          <CalendarCheck2 className="size-4 text-primary" />
         </div>
         <div className="flex-1">
           <p className="text-sm font-medium">{notification.title}</p>

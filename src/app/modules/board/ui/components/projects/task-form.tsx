@@ -8,23 +8,28 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectLabel,
+  SelectGroup,
+  SelectSeparator,
 } from "@/components/ui/select";
 import {
   TaskCard,
   TaskCardContent,
   TaskCardFooter,
   TaskCardHeader,
-} from "../ui/components/task-card";
+} from "./task-card";
 import { DateTimePicker } from "./date-time-picker";
 import { PrioritySelect } from "./priority-select";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { useProjectsStore } from "@/store/projects";
+import { useTodosStore } from "@/store/todos";
 
 interface TaskFormData {
   title: string;
   description: string;
   dueDate: Date | undefined;
   dueTime: string | null;
-  priority: string;
+  priority: string | undefined;
 }
 
 interface TaskFormProps {
@@ -33,6 +38,7 @@ interface TaskFormProps {
   onChange: (data: TaskFormData) => void;
   onCancel: () => void;
   isEditing?: boolean;
+  currentProjectId: string;
 }
 
 export function TaskForm({
@@ -41,8 +47,20 @@ export function TaskForm({
   onChange,
   onCancel,
   isEditing = false,
+  currentProjectId,
 }: TaskFormProps) {
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const { myProjects, invitedProjects } = useProjectsStore();
+  const { selectedProjectId, setSelectedProjectId } = useTodosStore();
+
+  useEffect(() => {
+    if (!selectedProjectId) {
+      setSelectedProjectId(currentProjectId);
+    }
+  }, [currentProjectId, selectedProjectId, setSelectedProjectId]);
+
+  const allProjects = [...myProjects, ...invitedProjects];
+  const currentProject = allProjects.find((p) => p.id === selectedProjectId);
 
   return (
     <TaskCard>
@@ -86,14 +104,40 @@ export function TaskForm({
         </TaskCardContent>
         <Separator className="my-2" />
         <TaskCardFooter className="pt-2 flex justify-between items-center">
-          <Select>
+          <Select
+            value={selectedProjectId}
+            onValueChange={setSelectedProjectId}
+            disabled={isEditing}
+          >
             <SelectTrigger className="h-7 w-[150px] text-xs">
-              <SelectValue placeholder="Select project" />
+              <SelectValue placeholder="Select project">
+                {currentProject?.name}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="travel">Travel</SelectItem>
-              <SelectItem value="work">Work</SelectItem>
-              <SelectItem value="personal">Personal</SelectItem>
+              {myProjects.length > 0 && (
+                <SelectGroup>
+                  <SelectLabel>My Projects</SelectLabel>
+                  {myProjects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              )}
+              {invitedProjects.length > 0 && (
+                <>
+                  {myProjects.length > 0 && <SelectSeparator />}
+                  <SelectGroup>
+                    <SelectLabel>Invited Projects</SelectLabel>
+                    {invitedProjects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </>
+              )}
             </SelectContent>
           </Select>
 

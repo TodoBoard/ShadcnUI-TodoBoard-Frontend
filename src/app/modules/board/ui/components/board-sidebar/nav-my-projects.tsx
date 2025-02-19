@@ -9,6 +9,7 @@ import {
   Plus,
   ChevronRight,
   Pencil,
+  Users,
 } from "lucide-react";
 
 import {
@@ -36,6 +37,8 @@ import { CreateProjectDialog } from "../board-dialog/create-project-dialog";
 import { NavInvitePeopleDialog } from "../board-dialog/invite-people-dialog";
 import { RenameProjectDialog } from "../board-dialog/rename-project-dialog";
 import { DeleteProjectDialog } from "../board-dialog/delete-project-dialog";
+import { ManageTeamDialog } from "../board-dialog/manage-team-dialog";
+import { useProjectsStore } from "@/store/projects";
 
 export function NavMyProjects({
   projects,
@@ -50,6 +53,7 @@ export function NavMyProjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
+  const { fetchProjects } = useProjectsStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const pathname = usePathname();
@@ -61,6 +65,7 @@ export function NavMyProjects({
   const [selectedProjectForDelete, setSelectedProjectForDelete] = useState<
     string | null
   >(null);
+  const [openManageTeamDialog, setOpenManageTeamDialog] = useState(false);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -155,6 +160,16 @@ export function NavMyProjects({
                     <Trash2 className="text-muted-foreground" />
                     <span>Delete Project</span>
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setSelectedProjectId(item.id);
+                      setOpenManageTeamDialog(true);
+                    }}
+                  >
+                    <Users className="text-muted-foreground" />
+                    <span>Manage Team</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
@@ -189,6 +204,23 @@ export function NavMyProjects({
           onOpenChange={(open) => {
             setOpenDeleteDialog(open);
             if (!open) setSelectedProjectForDelete(null);
+          }}
+        />
+      )}
+      {selectedProjectId && (
+        <ManageTeamDialog
+          projectId={selectedProjectId}
+          teamMembers={
+            projects.find((p) => p.id === selectedProjectId)?.team_members || []
+          }
+          open={openManageTeamDialog}
+          onOpenChange={(open) => {
+            setOpenManageTeamDialog(open);
+            if (!open) setSelectedProjectId(null);
+          }}
+          onTeamMemberRemoved={() => {
+            // Refresh projects to get updated team members
+            fetchProjects();
           }}
         />
       )}

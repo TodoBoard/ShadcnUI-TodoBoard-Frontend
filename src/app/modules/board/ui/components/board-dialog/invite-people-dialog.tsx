@@ -141,8 +141,6 @@ export function NavInvitePeopleDialog({
       const link = `${clientEnv.inviteUrl}${response.id}`;
       setInviteLink(link);
     } catch (error) {
-      console.error("Failed to generate invite link:", error);
-      // Here you might want to show an error message to the user
     }
   };
 
@@ -166,7 +164,6 @@ export function NavInvitePeopleDialog({
           url: link,
         });
       } catch (err) {
-        console.log("Error sharing:", err);
       }
     } else if (action.startsWith("mailto:") || action.startsWith("sms:")) {
       window.location.href = `${action}${encodeURIComponent(link)}`;

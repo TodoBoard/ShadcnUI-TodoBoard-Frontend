@@ -22,6 +22,12 @@ import {
 } from "@/models/projects";
 import { TwoFactorStatus, TwoFactorSetupResponse } from "@/models/security";
 import { InviteCreate, InviteResponse, InviteDetails } from "@/models/invites";
+import {
+  TodoListResponse,
+  TodoCreate,
+  TodoUpdateSchema,
+  TodoResponse,
+} from "@/models/todos";
 
 const api = axios.create({
   baseURL: clientEnv.apiUrl,
@@ -209,6 +215,20 @@ export const Projects = {
       throw handleApiError(error);
     }
   },
+
+  removeTeamMember: async (
+    projectId: string,
+    memberId: string
+  ): Promise<{ message: string }> => {
+    try {
+      const response = await api.delete<{ message: string }>(
+        `/project/${projectId}/team/${memberId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };
 
 export const Notifications = {
@@ -284,6 +304,47 @@ export const Invites = {
       const response = await api.post<{ message: string }>(
         `/invite/${inviteId}/join`
       );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+};
+
+export const Todos = {
+  getProjectTodos: async (projectId: string): Promise<TodoListResponse> => {
+    try {
+      const response = await api.get<TodoListResponse>(`/todos/${projectId}`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  createTodo: async (todo: TodoCreate): Promise<TodoResponse> => {
+    try {
+      const response = await api.post<TodoResponse>("/todo", todo);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  updateTodo: async (
+    todoId: string,
+    todo: TodoUpdateSchema
+  ): Promise<TodoResponse> => {
+    try {
+      const response = await api.put<TodoResponse>(`/todo/${todoId}`, todo);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteTodo: async (todoId: string): Promise<{ message: string }> => {
+    try {
+      const response = await api.delete<{ message: string }>(`/todo/${todoId}`);
       return response.data;
     } catch (error) {
       throw handleApiError(error);

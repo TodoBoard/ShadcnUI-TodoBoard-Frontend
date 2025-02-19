@@ -19,7 +19,7 @@ export function NoNotifications() {
         <h3 className="text-xl font-semibold">No Notifications Yet</h3>
         <p className="text-muted-foreground text-sm">You're all caught up!</p>
       </div>
-      <Link href="/board">
+      <Link href="/board/home">
         <Button size="lg" className="flex items-center gap-2 rounded-xl">
           <ArrowLeft className="w-4 h-4" />
           Go Back

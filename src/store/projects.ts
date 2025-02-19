@@ -3,6 +3,12 @@ import { Project } from "@/models/projects";
 import { Projects, handleApiError } from "@/lib/api";
 import { useNotificationsStore } from "@/store/notifications";
 
+interface TeamMember {
+  id: string;
+  username: string;
+  avatar_id: number;
+}
+
 interface ProjectsStore {
   myProjects: Project[];
   invitedProjects: Project[];
@@ -13,6 +19,7 @@ interface ProjectsStore {
   leaveProject: (projectId: string) => Promise<void>;
   renameProject: (projectId: string, newName: string) => Promise<void>;
   deleteProject: (projectId: string, totpCode?: string) => Promise<void>;
+  getCurrentProjectTeam: (projectId: string) => TeamMember[];
 }
 
 export const useProjectsStore = create<ProjectsStore>((set, get) => ({
@@ -25,12 +32,16 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
     set({ error: false, errorMessage: undefined });
     try {
       const data = await Projects.getProjects();
+      const { my_projects, invited_projects, unread_notifications_count } =
+        data;
       set({
-        myProjects: data.my_projects,
-        invitedProjects: data.invited_projects,
+        myProjects: my_projects,
+        invitedProjects: invited_projects,
         loading: false,
       });
-      useNotificationsStore.getState().setUnreadCount(data.unread_notifications_count);
+      useNotificationsStore
+        .getState()
+        .setUnreadCount(unread_notifications_count);
     } catch (error) {
       const errorMessage = handleApiError(error);
       set({ error: true, errorMessage, loading: false });
@@ -74,5 +85,11 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
       const errorMessage = handleApiError(error);
       set({ error: true, errorMessage });
     }
+  },
+  getCurrentProjectTeam: (projectId: string) => {
+    const project = [...get().myProjects, ...get().invitedProjects].find(
+      (p) => p.id === projectId
+    );
+    return project?.team_members || [];
   },
 }));
