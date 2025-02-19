@@ -32,6 +32,10 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { CreateProjectDialog } from "../board-dialog/create-project-dialog";
+import { NavInvitePeopleDialog } from "../board-dialog/invite-people-dialog";
+import { RenameProjectDialog } from "../board-dialog/rename-project-dialog";
+import { DeleteProjectDialog } from "../board-dialog/delete-project-dialog";
 
 export function NavMyProjects({
   projects,
@@ -47,7 +51,16 @@ export function NavMyProjects({
 }) {
   const { isMobile } = useSidebar();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const pathname = usePathname();
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
+  const [openRenameDialog, setOpenRenameDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectedProjectForDelete, setSelectedProjectForDelete] = useState<
+    string | null
+  >(null);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -59,6 +72,7 @@ export function NavMyProjects({
             size="icon"
             className="h-6 w-6 text-muted-foreground hover:text-foreground"
             aria-label="Add new project"
+            onClick={() => setOpenCreateDialog(true)}
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -112,16 +126,32 @@ export function NavMyProjects({
                   side={isMobile ? "bottom" : "right"}
                   align={isMobile ? "end" : "start"}
                 >
-                  <DropdownMenuItem>
-                    <Forward className="text-muted-foreground" />
-                    <span>Share Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <NavInvitePeopleDialog
+                    triggerContent={
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <Forward className="text-muted-foreground" />
+                        <span>Share Project</span>
+                      </DropdownMenuItem>
+                    }
+                    defaultProjectId={item.id}
+                  />
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setSelectedProjectId(item.id);
+                      setOpenRenameDialog(true);
+                    }}
+                  >
                     <Pencil className="text-muted-foreground" />
                     <span>Rename Project</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setSelectedProjectForDelete(item.id);
+                      setOpenDeleteDialog(true);
+                    }}
+                  >
                     <Trash2 className="text-muted-foreground" />
                     <span>Delete Project</span>
                   </DropdownMenuItem>
@@ -130,6 +160,37 @@ export function NavMyProjects({
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
+      )}
+
+      <CreateProjectDialog
+        open={openCreateDialog}
+        onOpenChange={setOpenCreateDialog}
+      />
+      {selectedProjectId && (
+        <RenameProjectDialog
+          projectId={selectedProjectId}
+          currentName={
+            projects.find((p) => p.id === selectedProjectId)?.name || ""
+          }
+          open={openRenameDialog}
+          onOpenChange={(open) => {
+            setOpenRenameDialog(open);
+            if (!open) setSelectedProjectId(null);
+          }}
+        />
+      )}
+      {selectedProjectForDelete && (
+        <DeleteProjectDialog
+          projectId={selectedProjectForDelete}
+          projectName={
+            projects.find((p) => p.id === selectedProjectForDelete)?.name || ""
+          }
+          open={openDeleteDialog}
+          onOpenChange={(open) => {
+            setOpenDeleteDialog(open);
+            if (!open) setSelectedProjectForDelete(null);
+          }}
+        />
       )}
     </SidebarGroup>
   );

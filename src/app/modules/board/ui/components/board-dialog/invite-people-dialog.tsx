@@ -53,6 +53,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface NavInvitePeopleDialogProps {
   triggerContent: React.ReactNode;
   shortcut?: string;
+  defaultProjectId?: string;
 }
 
 const shareOptions = [
@@ -93,6 +94,7 @@ const usageOptions = [
 export function NavInvitePeopleDialog({
   triggerContent,
   shortcut,
+  defaultProjectId,
 }: NavInvitePeopleDialogProps) {
   const id = useId();
   const [open, setOpen] = useState<boolean>(false);
@@ -120,6 +122,12 @@ export function NavInvitePeopleDialog({
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, [shortcut]);
+
+  useEffect(() => {
+    if (open && defaultProjectId) {
+      setSelectedProject(defaultProjectId);
+    }
+  }, [open, defaultProjectId]);
 
   const generateInviteLink = async () => {
     if (!selectedProject) return;

@@ -13,9 +13,15 @@ import {
 import { ProjectStatisticsResponse } from "@/models/stats";
 import { setAuthToken, clearAuthToken } from "@/lib/authHelpers";
 import { Notification, MarkAsReadResponse } from "@/models/notifications";
-import { ProjectListResponse } from "@/models/projects";
+import {
+  ProjectListResponse,
+  ProjectCreate,
+  ProjectResponse,
+  DeleteProjectRequest,
+  DeleteProjectResponse,
+} from "@/models/projects";
 import { TwoFactorStatus, TwoFactorSetupResponse } from "@/models/security";
-import { InviteCreate, InviteResponse } from "@/models/invites";
+import { InviteCreate, InviteResponse, InviteDetails } from "@/models/invites";
 
 const api = axios.create({
   baseURL: clientEnv.apiUrl,
@@ -45,6 +51,10 @@ export const handleApiError = (
 
     if (isAuth || isTwoFactor || error.response?.status === 400) {
       return error.response?.data?.detail || "Authentication failed";
+    }
+
+    if (error.response?.data?.detail) {
+      return error.response.data.detail;
     }
 
     return "Failed to contact API";
@@ -144,6 +154,61 @@ export const Projects = {
       throw handleApiError(error);
     }
   },
+
+  leaveProject: async (projectId: string): Promise<{ message: string }> => {
+    try {
+      const response = await api.post<{ message: string }>(
+        `/project/${projectId}/leave`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  createProject: async (data: ProjectCreate): Promise<ProjectResponse> => {
+    try {
+      const response = await api.post<ProjectResponse>("/project", data);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  updateProject: async (
+    projectId: string,
+    data: ProjectCreate
+  ): Promise<ProjectResponse> => {
+    try {
+      const response = await api.put<ProjectResponse>(
+        `/project/${projectId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteProject: async (
+    projectId: string,
+    totpCode?: string
+  ): Promise<DeleteProjectResponse> => {
+    try {
+      const data: DeleteProjectRequest = totpCode
+        ? { totp_code: totpCode }
+        : {};
+      const response = await api.delete<DeleteProjectResponse>(
+        `/project/${projectId}`,
+        {
+          data,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };
 
 export const Notifications = {
@@ -200,6 +265,28 @@ export const Security = {
       await api.post("/2fa/disable", { totp_code: code });
     } catch (error) {
       throw handleApiError(error, false, true);
+    }
+  },
+};
+
+export const Invites = {
+  getInvite: async (inviteId: string): Promise<InviteDetails> => {
+    try {
+      const response = await api.get<InviteDetails>(`/invite/${inviteId}`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  joinInvite: async (inviteId: string): Promise<{ message: string }> => {
+    try {
+      const response = await api.post<{ message: string }>(
+        `/invite/${inviteId}/join`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
     }
   },
 };

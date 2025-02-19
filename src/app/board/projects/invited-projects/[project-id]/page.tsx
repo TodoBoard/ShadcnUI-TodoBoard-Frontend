@@ -1,24 +1,10 @@
 "use client";
 
 import { NoTasks } from "@/app/modules/board/projects/no-tasks";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Plus, Pencil, Trash2 } from "lucide-react";
 import { useState, useCallback, useRef } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   TaskCard,
   TaskCardContent,
@@ -26,7 +12,7 @@ import {
   TaskCardHeader,
 } from "@/app/modules/board/ui/components/task-card";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { TaskForm } from "@/app/modules/board/projects/task-form";
 
 interface TaskFormData {
   title: string;
@@ -344,231 +330,25 @@ export default function InvitedProjectsPage() {
           .map((task) =>
             editingTask?.id === task.id ? (
               <TaskCard key={task.id}>
-                <form onSubmit={handleSubmit}>
-                  <TaskCardHeader>
-                    <input
-                      ref={titleInputRef}
-                      placeholder="Task name"
-                      value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
-                      className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
-                      required
-                    />
-                  </TaskCardHeader>
-                  <TaskCardContent>
-                    <textarea
-                      placeholder="Description"
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          description: e.target.value,
-                        })
-                      }
-                      className="w-full bg-transparent border-none resize-none outline-none text-xs text-gray-500 placeholder:text-muted-foreground focus:outline-none break-words"
-                      rows={2}
-                    />
-
-                    <div className="flex flex-wrap gap-1.5">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs justify-start text-left font-normal shadow-none"
-                          >
-                            <CalendarIcon className="mr-1 h-3 w-3" />
-                            {date ? (
-                              <span>
-                                {format(date, "PPP")}
-                                {time && ` at ${time}`}
-                              </span>
-                            ) : (
-                              <span>No date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <div className="rounded-lg border">
-                            <div className="flex max-sm:flex-col">
-                              <Calendar
-                                mode="single"
-                                selected={date}
-                                onSelect={(newDate) => {
-                                  if (newDate) {
-                                    setDate(newDate);
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      dueDate: newDate,
-                                    }));
-                                    setTime(null);
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      dueTime: null,
-                                    }));
-                                  }
-                                }}
-                                className="p-2 sm:pe-5"
-                                disabled={[{ before: today }]}
-                                initialFocus
-                              />
-                              <div className="relative w-full max-sm:h-48 sm:w-40">
-                                <div className="absolute inset-0 border-border py-4 max-sm:border-t">
-                                  <ScrollArea className="h-full border-border sm:border-s">
-                                    <div className="space-y-3">
-                                      <div className="flex h-5 shrink-0 items-center px-5">
-                                        <p className="text-sm font-medium">
-                                          {date
-                                            ? format(date, "EEEE, d")
-                                            : "Select a date"}
-                                        </p>
-                                      </div>
-                                      <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
-                                        {timeSlots.map(
-                                          ({ time: timeSlot, available }) => (
-                                            <Button
-                                              key={timeSlot}
-                                              variant={
-                                                time === timeSlot
-                                                  ? "default"
-                                                  : "outline"
-                                              }
-                                              size="sm"
-                                              className="w-full"
-                                              onClick={() => {
-                                                setTime(timeSlot);
-                                                setFormData((prev) => ({
-                                                  ...prev,
-                                                  dueTime: timeSlot,
-                                                }));
-                                              }}
-                                              disabled={!available || !date}
-                                            >
-                                              {timeSlot}
-                                            </Button>
-                                          )
-                                        )}
-                                      </div>
-                                    </div>
-                                  </ScrollArea>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-
-                      <Select
-                        value={formData.priority}
-                        onValueChange={(value) =>
-                          setFormData({ ...formData, priority: value })
-                        }
-                      >
-                        <SelectTrigger className="h-7 w-[100px] text-xs shadow-none">
-                          <SelectValue placeholder="Priority">
-                            {formData.priority && (
-                              <div className="flex items-center">
-                                <div
-                                  className={cn(
-                                    "w-2 h-2 rounded-full mr-2",
-                                    formData.priority === "default" &&
-                                      "bg-gray-300",
-                                    formData.priority === "low" &&
-                                      "bg-green-500",
-                                    formData.priority === "medium" &&
-                                      "bg-yellow-500",
-                                    formData.priority === "high" && "bg-red-500"
-                                  )}
-                                />
-                                {formData.priority === "default"
-                                  ? "Default"
-                                  : formData.priority.charAt(0).toUpperCase() +
-                                    formData.priority.slice(1)}
-                              </div>
-                            )}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem
-                            value="default"
-                            className="flex items-center"
-                          >
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full bg-gray-300 mr-2" />
-                              Default
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="low" className="flex items-center">
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                              Low
-                            </div>
-                          </SelectItem>
-                          <SelectItem
-                            value="medium"
-                            className="flex items-center"
-                          >
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" />
-                              Medium
-                            </div>
-                          </SelectItem>
-                          <SelectItem
-                            value="high"
-                            className="flex items-center"
-                          >
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                              High
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </TaskCardContent>
-                  <Separator className="my-2" />
-                  <TaskCardFooter className="pt-2 flex justify-between items-center">
-                    <Select>
-                      <SelectTrigger className="h-7 w-[150px] text-xs">
-                        <SelectValue placeholder="Select project" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="travel">Travel</SelectItem>
-                        <SelectItem value="work">Work</SelectItem>
-                        <SelectItem value="personal">Personal</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <div className="flex gap-1.5">
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          setEditingTask(null);
-                          setFormData({
-                            title: "",
-                            description: "",
-                            dueDate: undefined,
-                            dueTime: null,
-                            priority: "default",
-                          });
-                          setDate(undefined);
-                          setTime(null);
-                          setIsFormVisible(false);
-                        }}
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
-                      >
-                        Cancel
-                      </Button>
-                      <Button type="submit" size="sm" className="h-7 text-xs">
-                        Save changes
-                      </Button>
-                    </div>
-                  </TaskCardFooter>
-                </form>
+                <TaskForm
+                  formData={formData}
+                  onSubmit={handleSubmit}
+                  onChange={setFormData}
+                  onCancel={() => {
+                    setEditingTask(null);
+                    setFormData({
+                      title: "",
+                      description: "",
+                      dueDate: undefined,
+                      dueTime: null,
+                      priority: "default",
+                    });
+                    setDate(undefined);
+                    setTime(null);
+                    setIsFormVisible(false);
+                  }}
+                  isEditing
+                />
               </TaskCard>
             ) : (
               <TaskItem
@@ -623,254 +403,25 @@ export default function InvitedProjectsPage() {
                   .map((task) =>
                     editingTask?.id === task.id ? (
                       <TaskCard key={task.id}>
-                        <form onSubmit={handleSubmit}>
-                          <TaskCardHeader>
-                            <input
-                              ref={titleInputRef}
-                              placeholder="Task name"
-                              value={formData.title}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  title: e.target.value,
-                                })
-                              }
-                              className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
-                              required
-                            />
-                          </TaskCardHeader>
-                          <TaskCardContent>
-                            <textarea
-                              placeholder="Description"
-                              value={formData.description}
-                              onChange={(e) =>
-                                setFormData({
-                                  ...formData,
-                                  description: e.target.value,
-                                })
-                              }
-                              className="w-full bg-transparent border-none resize-none outline-none text-xs text-gray-500 placeholder:text-muted-foreground focus:outline-none break-words"
-                              rows={2}
-                            />
-
-                            <div className="flex flex-wrap gap-1.5">
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-7 text-xs justify-start text-left font-normal shadow-none"
-                                  >
-                                    <CalendarIcon className="mr-1 h-3 w-3" />
-                                    {date ? (
-                                      <span>
-                                        {format(date, "PPP")}
-                                        {time && ` at ${time}`}
-                                      </span>
-                                    ) : (
-                                      <span>No date</span>
-                                    )}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                  className="w-auto p-0"
-                                  align="start"
-                                >
-                                  <div className="rounded-lg border">
-                                    <div className="flex max-sm:flex-col">
-                                      <Calendar
-                                        mode="single"
-                                        selected={date}
-                                        onSelect={(newDate) => {
-                                          if (newDate) {
-                                            setDate(newDate);
-                                            setFormData((prev) => ({
-                                              ...prev,
-                                              dueDate: newDate,
-                                            }));
-                                            setTime(null);
-                                            setFormData((prev) => ({
-                                              ...prev,
-                                              dueTime: null,
-                                            }));
-                                          }
-                                        }}
-                                        className="p-2 sm:pe-5"
-                                        disabled={[{ before: today }]}
-                                        initialFocus
-                                      />
-                                      <div className="relative w-full max-sm:h-48 sm:w-40">
-                                        <div className="absolute inset-0 border-border py-4 max-sm:border-t">
-                                          <ScrollArea className="h-full border-border sm:border-s">
-                                            <div className="space-y-3">
-                                              <div className="flex h-5 shrink-0 items-center px-5">
-                                                <p className="text-sm font-medium">
-                                                  {date
-                                                    ? format(date, "EEEE, d")
-                                                    : "Select a date"}
-                                                </p>
-                                              </div>
-                                              <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
-                                                {timeSlots.map(
-                                                  ({
-                                                    time: timeSlot,
-                                                    available,
-                                                  }) => (
-                                                    <Button
-                                                      key={timeSlot}
-                                                      variant={
-                                                        time === timeSlot
-                                                          ? "default"
-                                                          : "outline"
-                                                      }
-                                                      size="sm"
-                                                      className="w-full"
-                                                      onClick={() => {
-                                                        setTime(timeSlot);
-                                                        setFormData((prev) => ({
-                                                          ...prev,
-                                                          dueTime: timeSlot,
-                                                        }));
-                                                      }}
-                                                      disabled={
-                                                        !available || !date
-                                                      }
-                                                    >
-                                                      {timeSlot}
-                                                    </Button>
-                                                  )
-                                                )}
-                                              </div>
-                                            </div>
-                                          </ScrollArea>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-
-                              <Select
-                                value={formData.priority}
-                                onValueChange={(value) =>
-                                  setFormData({ ...formData, priority: value })
-                                }
-                              >
-                                <SelectTrigger className="h-7 w-[100px] text-xs">
-                                  <SelectValue placeholder="Priority">
-                                    {formData.priority && (
-                                      <div className="flex items-center">
-                                        <div
-                                          className={cn(
-                                            "w-2 h-2 rounded-full mr-2",
-                                            formData.priority === "default" &&
-                                              "bg-gray-300",
-                                            formData.priority === "low" &&
-                                              "bg-green-500",
-                                            formData.priority === "medium" &&
-                                              "bg-yellow-500",
-                                            formData.priority === "high" &&
-                                              "bg-red-500"
-                                          )}
-                                        />
-                                        {formData.priority === "default"
-                                          ? "Default"
-                                          : formData.priority
-                                              .charAt(0)
-                                              .toUpperCase() +
-                                            formData.priority.slice(1)}
-                                      </div>
-                                    )}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem
-                                    value="default"
-                                    className="flex items-center"
-                                  >
-                                    <div className="flex items-center">
-                                      <div className="w-2 h-2 rounded-full bg-gray-300 mr-2" />
-                                      Default
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem
-                                    value="low"
-                                    className="flex items-center"
-                                  >
-                                    <div className="flex items-center">
-                                      <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                                      Low
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem
-                                    value="medium"
-                                    className="flex items-center"
-                                  >
-                                    <div className="flex items-center">
-                                      <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" />
-                                      Medium
-                                    </div>
-                                  </SelectItem>
-                                  <SelectItem
-                                    value="high"
-                                    className="flex items-center"
-                                  >
-                                    <div className="flex items-center">
-                                      <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                                      High
-                                    </div>
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </TaskCardContent>
-                          <Separator className="my-2" />
-                          <TaskCardFooter className="pt-2 flex justify-between items-center">
-                            <Select>
-                              <SelectTrigger className="h-7 w-[150px] text-xs shadow-none">
-                                <SelectValue placeholder="Select project" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="travel">Travel</SelectItem>
-                                <SelectItem value="work">Work</SelectItem>
-                                <SelectItem value="personal">
-                                  Personal
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-
-                            <div className="flex gap-1.5">
-                              <Button
-                                type="button"
-                                onClick={() => {
-                                  setEditingTask(null);
-                                  setFormData({
-                                    title: "",
-                                    description: "",
-                                    dueDate: undefined,
-                                    dueTime: null,
-                                    priority: "default",
-                                  });
-                                  setDate(undefined);
-                                  setTime(null);
-                                  setIsFormVisible(false);
-                                }}
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs"
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                type="submit"
-                                size="sm"
-                                className="h-7 text-xs"
-                              >
-                                Save changes
-                              </Button>
-                            </div>
-                          </TaskCardFooter>
-                        </form>
+                        <TaskForm
+                          formData={formData}
+                          onSubmit={handleSubmit}
+                          onChange={setFormData}
+                          onCancel={() => {
+                            setEditingTask(null);
+                            setFormData({
+                              title: "",
+                              description: "",
+                              dueDate: undefined,
+                              dueTime: null,
+                              priority: "default",
+                            });
+                            setDate(undefined);
+                            setTime(null);
+                            setIsFormVisible(false);
+                          }}
+                          isEditing
+                        />
                       </TaskCard>
                     ) : (
                       <TaskItem
@@ -902,217 +453,21 @@ export default function InvitedProjectsPage() {
         )}
 
         {!editingTask && isFormVisible && (
-          <TaskCard className="mt-4">
-            <form onSubmit={handleSubmit}>
-              <TaskCardHeader>
-                <input
-                  ref={titleInputRef}
-                  placeholder="Task name"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
-                  required
-                />
-              </TaskCardHeader>
-              <TaskCardContent>
-                <textarea
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  className="w-full bg-transparent border-none resize-none outline-none text-xs text-gray-500 placeholder:text-muted-foreground focus:outline-none break-words"
-                  rows={2}
-                />
-
-                <div className="flex flex-wrap gap-1.5">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs justify-start text-left font-normal shadow-none"
-                      >
-                        <CalendarIcon className="mr-1 h-3 w-3" />
-                        {date ? (
-                          <span>
-                            {format(date, "PPP")}
-                            {time && ` at ${time}`}
-                          </span>
-                        ) : (
-                          <span>No date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <div className="rounded-lg border">
-                        <div className="flex max-sm:flex-col">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={(newDate) => {
-                              if (newDate) {
-                                setDate(newDate);
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  dueDate: newDate,
-                                }));
-                                setTime(null);
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  dueTime: null,
-                                }));
-                              }
-                            }}
-                            className="p-2 sm:pe-5"
-                            disabled={[{ before: today }]}
-                            initialFocus
-                          />
-                          <div className="relative w-full max-sm:h-48 sm:w-40">
-                            <div className="absolute inset-0 border-border py-4 max-sm:border-t">
-                              <ScrollArea className="h-full border-border sm:border-s">
-                                <div className="space-y-3">
-                                  <div className="flex h-5 shrink-0 items-center px-5">
-                                    <p className="text-sm font-medium">
-                                      {date
-                                        ? format(date, "EEEE, d")
-                                        : "Select a date"}
-                                    </p>
-                                  </div>
-                                  <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
-                                    {timeSlots.map(
-                                      ({ time: timeSlot, available }) => (
-                                        <Button
-                                          key={timeSlot}
-                                          variant={
-                                            time === timeSlot
-                                              ? "default"
-                                              : "outline"
-                                          }
-                                          size="sm"
-                                          className="w-full"
-                                          onClick={() => {
-                                            setTime(timeSlot);
-                                            setFormData((prev) => ({
-                                              ...prev,
-                                              dueTime: timeSlot,
-                                            }));
-                                          }}
-                                          disabled={!available || !date}
-                                        >
-                                          {timeSlot}
-                                        </Button>
-                                      )
-                                    )}
-                                  </div>
-                                </div>
-                              </ScrollArea>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-
-                  <Select
-                    value={formData.priority}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, priority: value })
-                    }
-                  >
-                    <SelectTrigger className="h-7 w-[100px] text-xs shadow-none">
-                      <SelectValue placeholder="Priority">
-                        {formData.priority && (
-                          <div className="flex items-center">
-                            <div
-                              className={cn(
-                                "w-2 h-2 rounded-full mr-2",
-                                formData.priority === "default" &&
-                                  "bg-gray-300",
-                                formData.priority === "low" && "bg-green-500",
-                                formData.priority === "medium" &&
-                                  "bg-yellow-500",
-                                formData.priority === "high" && "bg-red-500"
-                              )}
-                            />
-                            {formData.priority === "default"
-                              ? "Default"
-                              : formData.priority.charAt(0).toUpperCase() +
-                                formData.priority.slice(1)}
-                          </div>
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default" className="flex items-center">
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 rounded-full bg-gray-300 mr-2" />
-                          Default
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="low" className="flex items-center">
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                          Low
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="medium" className="flex items-center">
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" />
-                          Medium
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="high" className="flex items-center">
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                          High
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TaskCardContent>
-              <Separator className="my-2" />
-              <TaskCardFooter className="pt-2 flex justify-between items-center">
-                <Select>
-                  <SelectTrigger className="h-7 w-[150px] text-xs">
-                    <SelectValue placeholder="Select project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="travel">Travel</SelectItem>
-                    <SelectItem value="work">Work</SelectItem>
-                    <SelectItem value="personal">Personal</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <div className="flex gap-1.5">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setIsFormVisible(false);
-                      setFormData({
-                        title: "",
-                        description: "",
-                        dueDate: undefined,
-                        dueTime: null,
-                        priority: "default",
-                      });
-                    }}
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" size="sm" className="h-7 text-xs">
-                    {editingTask ? "Save changes" : "Add task"}
-                  </Button>
-                </div>
-              </TaskCardFooter>
-            </form>
-          </TaskCard>
+          <TaskForm
+            formData={formData}
+            onSubmit={handleSubmit}
+            onChange={setFormData}
+            onCancel={() => {
+              setIsFormVisible(false);
+              setFormData({
+                title: "",
+                description: "",
+                dueDate: undefined,
+                dueTime: null,
+                priority: "default",
+              });
+            }}
+          />
         )}
       </div>
 

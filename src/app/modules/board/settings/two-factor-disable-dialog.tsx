@@ -89,10 +89,15 @@ export function TwoFactorDisableDialog({
             <InputOTP
               ref={inputRef}
               value={code}
-              onChange={setCode}
+              onChange={(value) => {
+                if (/^\d*$/.test(value)) {
+                  setCode(value);
+                }
+              }}
               maxLength={6}
               onComplete={handleDisable}
               containerClassName="group flex items-center justify-center has-[:disabled]:opacity-50"
+              inputMode="numeric"
             >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />

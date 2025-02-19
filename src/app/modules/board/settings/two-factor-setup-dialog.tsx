@@ -190,9 +190,14 @@ export function TwoFactorSetupDialog({
               <div className="space-y-6">
                 <InputOTP
                   value={verificationCode}
-                  onChange={setVerificationCode}
+                  onChange={(value) => {
+                    if (/^\d*$/.test(value)) {
+                      setVerificationCode(value);
+                    }
+                  }}
                   maxLength={6}
                   containerClassName="group flex items-center justify-center has-[:disabled]:opacity-50"
+                  inputMode="numeric"
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />

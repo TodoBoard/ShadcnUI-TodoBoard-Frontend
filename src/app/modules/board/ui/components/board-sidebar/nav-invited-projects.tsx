@@ -28,6 +28,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useProjectsStore } from "@/store/projects";
+import { toast } from "sonner";
 
 export function NavInvitedProjects({
   projects,
@@ -36,12 +38,23 @@ export function NavInvitedProjects({
     name: string;
     url: string;
     icon: LucideIcon;
-    key: string;
+    id: string;
   }[];
 }) {
   const { isMobile } = useSidebar();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+  const { leaveProject } = useProjectsStore();
+
+  const handleLeaveProject = async (projectId: string, projectName: string) => {
+    const id = projectId.split("-").slice(-5).join("-");
+    try {
+      await leaveProject(id);
+      toast.success(`Left project ${projectName} successfully`);
+    } catch (error) {
+      toast.error("Failed to leave project");
+    }
+  };
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -64,7 +77,7 @@ export function NavInvitedProjects({
       {!isCollapsed && (
         <SidebarMenu>
           {projects.map((item) => (
-            <SidebarMenuItem key={item.key}>
+            <SidebarMenuItem key={item.id}>
               <SidebarMenuButton asChild>
                 <Link
                   href={item.url}
@@ -96,8 +109,11 @@ export function NavInvitedProjects({
                   side={isMobile ? "bottom" : "right"}
                   align={isMobile ? "end" : "start"}
                 >
-                  <DropdownMenuItem>
-                    <LogOut className="text-muted-foreground" />
+                  <DropdownMenuItem
+                    onClick={() => handleLeaveProject(item.id, item.name)}
+                    className="cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>Leave Project</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

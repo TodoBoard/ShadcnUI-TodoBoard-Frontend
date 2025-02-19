@@ -12,16 +12,25 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NoProjects } from "./no-projects";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { handleApiError } from "@/lib/api";
+import { slugify } from "@/utils/format-projects";
 
 const SKELETON_COUNT = 3;
 
-export function ProjectGrid({ projects }: { projects: Project[] }) {
+export function ProjectGrid({
+  projects,
+  type,
+}: {
+  projects: Project[];
+  type: "my-projects" | "invited-projects";
+}) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {projects.map((project) => (
         <Link
           key={project.id}
-          href={`/board/projects/my-projects/${project.name}`}
+          href={`/board/projects/${type}/${slugify(project.name)}-id=${
+            project.id
+          }`}
           className="block hover:opacity-90 transition-opacity"
         >
           <Card className="shadow-none">
@@ -174,9 +183,12 @@ export function ProjectStats() {
     );
   }
 
-  const renderProjects = (projects: Project[]) => {
+  const renderProjects = (
+    projects: Project[],
+    type: "my-projects" | "invited-projects"
+  ) => {
     return projects.length > 0 ? (
-      <ProjectGrid projects={projects} />
+      <ProjectGrid projects={projects} type={type} />
     ) : (
       <NoProjects />
     );
@@ -193,11 +205,11 @@ export function ProjectStats() {
   return (
     <>
       <TabsContent value="my-projects">
-        {renderProjects(projectStats.my_projects)}
+        {renderProjects(projectStats.my_projects, "my-projects")}
       </TabsContent>
 
       <TabsContent value="invited-projects">
-        {renderProjects(projectStats.invited_projects)}
+        {renderProjects(projectStats.invited_projects, "invited-projects")}
       </TabsContent>
     </>
   );

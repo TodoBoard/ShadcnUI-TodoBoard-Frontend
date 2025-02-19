@@ -11,3 +11,9 @@ export interface InviteResponse {
   usage_count: number;
   active: boolean;
 }
+
+export interface InviteDetails extends InviteResponse {
+  project_name: string;
+  invite_creator_username: string;
+  invite_creator_avatar_id: number;
+}

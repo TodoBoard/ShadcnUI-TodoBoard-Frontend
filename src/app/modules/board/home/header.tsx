@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CreateProjectDialog } from "../ui/components/board-dialog/create-project-dialog";
 
 interface HeaderProps {
   className?: string;
@@ -12,6 +13,7 @@ interface HeaderProps {
 export function Header({ className }: HeaderProps) {
   const [username, setUsername] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     const fetchUsername = () => {
@@ -31,14 +33,19 @@ export function Header({ className }: HeaderProps) {
   };
 
   return (
-    <div className={`flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center ${className ?? ""}`}>
-      <h1 className="font-bold text-2xl">{renderWelcomeMessage()}</h1>
-      <Button
-        className="w-full sm:w-auto flex items-center justify-center gap-2 shadow-none rounded-xl"
-      >
-        <PlusCircle className="h-4 w-4" />
-        New Project
-      </Button>
-    </div>
+    <>
+      <div className={`flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center ${className ?? ""}`}>
+        <h1 className="font-bold text-2xl">{renderWelcomeMessage()}</h1>
+        <Button
+          className="w-full sm:w-auto flex items-center justify-center gap-2 shadow-none rounded-xl"
+          onClick={() => setOpenDialog(true)}
+        >
+          <PlusCircle className="h-4 w-4" />
+          New Project
+        </Button>
+      </div>
+
+      <CreateProjectDialog open={openDialog} onOpenChange={setOpenDialog} />
+    </>
   );
 }

@@ -2,7 +2,7 @@ import { Project } from "@/models/projects";
 import { Folder } from "lucide-react";
 
 // Neue Helper-Funktion zum Slugifizieren des Projektnamens
-const slugify = (text: string) => {
+export const slugify = (text: string) => {
   return text
     .trim()
     .toLowerCase()
