@@ -14,6 +14,23 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 // Mock time slots data
 const timeSlots = [
+  { time: "00:30", available: true },
+  { time: "01:00", available: true },
+  { time: "01:30", available: true },
+  { time: "02:00", available: true },
+  { time: "02:30", available: true },
+  { time: "03:00", available: true },
+  { time: "03:30", available: true },
+  { time: "04:00", available: true },
+  { time: "04:30", available: true },
+  { time: "05:00", available: true },
+  { time: "05:30", available: true },
+  { time: "06:00", available: true },
+  { time: "06:30", available: true },
+  { time: "07:00", available: true },
+  { time: "07:30", available: true },
+  { time: "08:00", available: true },
+  { time: "08:30", available: true },
   { time: "09:00", available: true },
   { time: "09:30", available: true },
   { time: "10:00", available: true },
