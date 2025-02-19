@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { Project } from "@/models/projects";
 import { Projects, handleApiError } from "@/lib/api";
+import { useNotificationsStore } from "@/store/notifications";
 
 interface ProjectsStore {
   myProjects: Project[];
@@ -29,6 +30,7 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
         invitedProjects: data.invited_projects,
         loading: false,
       });
+      useNotificationsStore.getState().setUnreadCount(data.unread_notifications_count);
     } catch (error) {
       const errorMessage = handleApiError(error);
       set({ error: true, errorMessage, loading: false });

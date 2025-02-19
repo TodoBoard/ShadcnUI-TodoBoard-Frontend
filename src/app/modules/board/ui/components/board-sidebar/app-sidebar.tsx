@@ -79,9 +79,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useEffect(() => {
     const fetch = async () => {
       await fetchProjects();
-      // Hier müssen wir die notifications count anders bekommen
-      // Entweder über einen separaten API call oder der Projects endpoint
-      // muss die count weiterhin zurückgeben
     };
 
     fetch();
