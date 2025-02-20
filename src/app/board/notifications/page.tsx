@@ -1,4 +1,10 @@
 import { NotificationsClient } from "@/app/modules/board/notifications/notifications-client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "TodoBoard | Notifications",
+  description: "Notifications page",
+};
 
 export default function NotificationsPage() {
   return (

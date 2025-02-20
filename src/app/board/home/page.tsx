@@ -2,6 +2,13 @@ import { FolderIcon, Users } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectStats } from "@/app/modules/board/home/project-stats";
 import { Header } from "@/app/modules/board/home/header";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "TodoBoard | Home",
+  description: "Home page",
+};
+
 
 export default function BoardHomePage() {
   return (

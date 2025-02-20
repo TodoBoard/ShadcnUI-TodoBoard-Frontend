@@ -1,4 +1,11 @@
 import { PasswordResetForm } from "@/app/modules/auth/reset-password/reset-password-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "TodoBoard | Reset Password",
+  description: "Reset your password",
+};
+
 
 export default function ResetPasswordPage() {
   return (

@@ -1,4 +1,11 @@
 import { RegisterForm } from "@/app/modules/auth/register/register-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "TodoBoard | Register",
+  description: "Register to your account",
+};
+
 
 export default function RegisterPage() {
   return (
