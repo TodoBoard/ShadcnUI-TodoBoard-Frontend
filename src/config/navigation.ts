@@ -1,4 +1,4 @@
-import { Home, Bell, UserPlus, Settings, type LucideIcon } from "lucide-react";//TODO
+import { Home, Bell, UserPlus, Settings, type LucideIcon, BookOpenCheck } from "lucide-react";//TODO
 import * as React from "react";
 import { NavInvitePeopleDialog } from "@/app/modules/board/ui/components/board-dialog/invite-people-dialog";
 
@@ -37,5 +37,10 @@ export const mainNavItems: NavigationItem[] = [
     title: "Settings",
     icon: Settings,
     url: "/board/settings",
+  },
+  {
+    title: "Todos",
+    icon: BookOpenCheck,
+    url: "/board/todos",
   },
 ];
