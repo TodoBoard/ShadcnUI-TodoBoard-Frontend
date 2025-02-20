@@ -24,6 +24,6 @@ RUN addgroup -g 1001 -S nodejs && \
     chown -R nextjs:nodejs /app
 USER nextjs
 
-EXPOSE 3000
+EXPOSE 3005
 
 CMD ["npm", "start"]
