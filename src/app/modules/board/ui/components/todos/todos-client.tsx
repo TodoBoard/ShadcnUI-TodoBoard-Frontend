@@ -7,7 +7,6 @@ import { TaskSkeletonList } from "@/app/modules/board/ui/components/projects/tas
 import { Todo } from "@/models/todos";
 import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
-import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ErrorState } from "@/app/modules/board/ui/components/projects/projects-error-state";
 
