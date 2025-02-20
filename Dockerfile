@@ -19,10 +19,10 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next/static ./.next/static
 
-RUN addgroup -S frontend && adduser -S -G frontend frontend && \
-    chown -R frontend:frontend /app
-
-USER frontend
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 && \
+    chown -R nextjs:nodejs /app
+USER nextjs
 
 EXPOSE 3000
 
