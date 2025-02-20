@@ -9,6 +9,7 @@ import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
 import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ErrorState } from "@/app/modules/board/ui/components/projects/projects-error-state";
 
 export function TodosClient() {
   const [username, setUsername] = useState<string>("");
@@ -44,7 +45,7 @@ export function TodosClient() {
         name: isCurrentUser ? "You" : todo.username,
         avatar: todo.avatar_id 
           ? `/user/avatar/${todo.avatar_id}.png` 
-          : undefined,
+          : "",
       },
     };
   };
@@ -91,7 +92,10 @@ export function TodosClient() {
         {loading ? (
           <TaskSkeletonList />
         ) : error ? (
-          <div>Error loading todos</div>
+          <ErrorState
+            title="404 Todos Not Found"
+            message="Failed to load your todos. Please try again later."
+          />
         ) : (
           <>
             {activeTodos.map((todo) => (

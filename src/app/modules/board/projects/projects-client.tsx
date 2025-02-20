@@ -98,7 +98,7 @@ export default function ProjectsClient() {
   };
 
   const transformTodoToTask = (todo: Todo) => {
-    const dueDate = todo.due_date ? new Date(todo.due_date) : undefined;
+    const dueDate = todo.due_date ? parseISO(todo.due_date) : undefined;
     const isCurrentUser = todo.username === username || !todo.username;
     return {
       id: todo.id,
@@ -116,7 +116,7 @@ export default function ProjectsClient() {
           ? `/user/avatar/${todo.avatar_id}.png`
           : avatarId
           ? `/user/avatar/${avatarId}.png`
-          : undefined,
+          : "",
       },
     };
   };
@@ -209,7 +209,7 @@ export default function ProjectsClient() {
           ? `/user/avatar/${todo.avatar_id}.png`
           : avatarId
           ? `/user/avatar/${avatarId}.png`
-          : undefined,
+          : "",
       },
     });
 
