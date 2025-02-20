@@ -61,7 +61,6 @@ export default function ProjectsClient() {
   const { getCurrentProjectTeam } = useProjectsStore();
   const teamMembers = getCurrentProjectTeam(projectId);
 
-  // Filtere Todos für das aktuelle Projekt
   const currentProjectTodos = getProjectTodos(projectId);
 
   useEffect(() => {
@@ -319,7 +318,6 @@ export default function ProjectsClient() {
                 )
               )}
 
-            {/* Completed Tasks Section */}
             {currentProjectTodos.some((todo) => todo.status === "done") && (
               <CompletedTasks
                 showCompleted={showCompleted}
@@ -334,7 +332,6 @@ export default function ProjectsClient() {
               />
             )}
 
-            {/* Add Task Button and Form */}
             {!editingTask && !isFormVisible && (
               <button
                 onClick={handleAddTaskClick}

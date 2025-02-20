@@ -167,7 +167,6 @@ export function NavInvitePeopleDialog({
           url: link,
         });
       } catch (error: unknown) {
-        // Ignore share cancellation errors
         if (error instanceof Error && error.name !== 'AbortError') {
           toast.error("Failed to share link");
         }
@@ -180,7 +179,6 @@ export function NavInvitePeopleDialog({
   const handleOpenChange = (open: boolean) => {
     setOpen(open);
     if (!open) {
-      // Reset state when dialog is closed
       setInviteLink("");
       setSelectedProject("");
       setSettings(defaultSettings);

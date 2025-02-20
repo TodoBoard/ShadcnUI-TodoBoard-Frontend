@@ -1,4 +1,4 @@
-import { TodosClient } from "@/app/modules/board/ui/components/todos/todos-client";
+import { TodosClient } from "@/app/modules/board/todos/todos-client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

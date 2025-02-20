@@ -27,7 +27,6 @@ export function useProjectTitle() {
 
         setProjectTitle(formattedTitle);
       } catch {
-        // Silently handle errors
       }
     };
 

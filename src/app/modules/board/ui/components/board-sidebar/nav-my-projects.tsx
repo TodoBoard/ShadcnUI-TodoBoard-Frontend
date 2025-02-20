@@ -37,6 +37,7 @@ import { RenameProjectDialog } from "../board-dialog/rename-project-dialog";
 import { DeleteProjectDialog } from "../board-dialog/delete-project-dialog";
 import { ManageTeamDialog } from "../board-dialog/manage-team-dialog";
 import { useProjectsStore } from "@/store/projects";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 export function NavMyProjects({
   projects,
@@ -51,7 +52,7 @@ export function NavMyProjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
-  const { fetchProjects } = useProjectsStore();
+  const { fetchProjects, updateProjectSorting } = useProjectsStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const pathname = usePathname();
@@ -64,6 +65,18 @@ export function NavMyProjects({
     string | null
   >(null);
   const [openManageTeamDialog, setOpenManageTeamDialog] = useState(false);
+
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(projects);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    updateProjectSorting(
+      items.map((item) => item.id.split("-").slice(-5).join("-"))
+    );
+  };
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -95,84 +108,105 @@ export function NavMyProjects({
         </div>
       </div>
       {!isCollapsed && (
-        <SidebarMenu>
-          {projects.map((item) => (
-            <SidebarMenuItem key={item.key}>
-              <SidebarMenuButton asChild>
-                <Link
-                  href={item.url}
-                  className={cn({
-                    "bg-sidebar-accent": pathname === item.url,
-                    "text-sidebar-primary": pathname === item.url,
-                    "text-muted-foreground": pathname !== item.url,
-                    "flex items-center gap-2 p-2 rounded": true,
-                  })}
-                >
-                  <item.icon
-                    className={cn({
-                      "text-sidebar-primary": pathname === item.url,
-                      "text-muted-foreground": pathname !== item.url,
-                    })}
-                  />
-                  <span>{item.name}</span>
-                </Link>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-lg"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <NavInvitePeopleDialog
-                    triggerContent={
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        <Forward className="text-muted-foreground" />
-                        <span>Share Project</span>
-                      </DropdownMenuItem>
-                    }
-                    defaultProjectId={item.id}
-                  />
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setSelectedProjectId(item.id);
-                      setOpenRenameDialog(true);
-                    }}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="my-projects">
+            {(provided) => (
+              <SidebarMenu {...provided.droppableProps} ref={provided.innerRef}>
+                {projects.map((item, index) => (
+                  <Draggable
+                    key={item.key}
+                    draggableId={item.key}
+                    index={index}
                   >
-                    <Pencil className="text-muted-foreground" />
-                    <span>Rename Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setSelectedProjectForDelete(item.id);
-                      setOpenDeleteDialog(true);
-                    }}
-                  >
-                    <Trash2 className="text-muted-foreground" />
-                    <span>Delete Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setSelectedProjectId(item.id);
-                      setOpenManageTeamDialog(true);
-                    }}
-                  >
-                    <Users className="text-muted-foreground" />
-                    <span>Manage Team</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+                    {(provided) => (
+                      <SidebarMenuItem
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <SidebarMenuButton asChild>
+                          <Link
+                            href={item.url}
+                            className={cn({
+                              "bg-sidebar-accent": pathname === item.url,
+                              "text-sidebar-primary": pathname === item.url,
+                              "text-muted-foreground": pathname !== item.url,
+                              "flex items-center gap-2 p-2 rounded": true,
+                            })}
+                          >
+                            <item.icon
+                              className={cn({
+                                "text-sidebar-primary": pathname === item.url,
+                                "text-muted-foreground": pathname !== item.url,
+                              })}
+                            />
+                            <span>{item.name}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <SidebarMenuAction showOnHover>
+                              <MoreHorizontal />
+                              <span className="sr-only">More</span>
+                            </SidebarMenuAction>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="w-48 rounded-lg"
+                            side={isMobile ? "bottom" : "right"}
+                            align={isMobile ? "end" : "start"}
+                          >
+                            <NavInvitePeopleDialog
+                              triggerContent={
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                >
+                                  <Forward className="text-muted-foreground" />
+                                  <span>Share Project</span>
+                                </DropdownMenuItem>
+                              }
+                              defaultProjectId={item.id}
+                            />
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault();
+                                setSelectedProjectId(item.id);
+                                setOpenRenameDialog(true);
+                              }}
+                            >
+                              <Pencil className="text-muted-foreground" />
+                              <span>Rename Project</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault();
+                                setSelectedProjectForDelete(item.id);
+                                setOpenDeleteDialog(true);
+                              }}
+                            >
+                              <Trash2 className="text-muted-foreground" />
+                              <span>Delete Project</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault();
+                                setSelectedProjectId(item.id);
+                                setOpenManageTeamDialog(true);
+                              }}
+                            >
+                              <Users className="text-muted-foreground" />
+                              <span>Manage Team</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </SidebarMenu>
+            )}
+          </Droppable>
+        </DragDropContext>
       )}
 
       <CreateProjectDialog
@@ -217,7 +251,6 @@ export function NavMyProjects({
             if (!open) setSelectedProjectId(null);
           }}
           onTeamMemberRemoved={() => {
-            // Refresh projects to get updated team members
             fetchProjects();
           }}
         />

@@ -38,3 +38,7 @@ export interface DeleteProjectRequest {
 export interface DeleteProjectResponse {
   message: string;
 }
+
+export interface ProjectSortingResponse {
+  project_ids: string[];
+}

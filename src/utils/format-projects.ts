@@ -1,13 +1,12 @@
 import { Project } from "@/models/projects";
 import { Folder } from "lucide-react";
 
-// Neue Helper-Funktion zum Slugifizieren des Projektnamens
 export const slugify = (text: string) => {
   return text
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, "-") // ersetzt Leerzeichen durch Bindestriche
-    .replace(/[^a-z0-9\-]/g, ""); // entfernt Sonderzeichen
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "");
 };
 
 export const formatProjects = (
@@ -16,7 +15,6 @@ export const formatProjects = (
   currentPath?: string
 ) =>
   projects.map((project, index) => {
-    // Verwende slugify, um den Projektnamen sauber zu formatieren
     const slugName = slugify(project.name);
     const projectUrl = `/board/projects/${type}/${slugName}-id=${project.id}`;
     return {

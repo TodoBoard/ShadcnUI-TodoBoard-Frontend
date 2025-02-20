@@ -23,7 +23,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
-const mainNavItems = [//TODO
+const mainNavItems = [
   {
     title: "Search",
     dialog: true,

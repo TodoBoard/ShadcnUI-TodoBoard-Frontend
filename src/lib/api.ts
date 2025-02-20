@@ -19,6 +19,7 @@ import {
   ProjectResponse,
   DeleteProjectRequest,
   DeleteProjectResponse,
+  ProjectSortingResponse,
 } from "@/models/projects";
 import { TwoFactorStatus, TwoFactorSetupResponse } from "@/models/security";
 import { InviteCreate, InviteResponse, InviteDetails } from "@/models/invites";
@@ -224,6 +225,19 @@ export const Projects = {
       const response = await api.delete<{ message: string }>(
         `/project/${projectId}/team/${memberId}`
       );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  updateProjectSorting: async (
+    projectIds: string[]
+  ): Promise<ProjectSortingResponse> => {
+    try {
+      const response = await api.put<ProjectSortingResponse>("/projects/sort", {
+        project_ids: projectIds,
+      });
       return response.data;
     } catch (error) {
       throw handleApiError(error);

@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-// Mock time slots data
 const timeSlots = [
   { time: "00:30", available: true },
   { time: "01:00", available: true },

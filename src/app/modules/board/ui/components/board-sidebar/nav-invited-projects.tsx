@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useProjectsStore } from "@/store/projects";
 import { toast } from "sonner";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 export function NavInvitedProjects({
   projects,
@@ -43,7 +44,7 @@ export function NavInvitedProjects({
   const { isMobile } = useSidebar();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
-  const { leaveProject } = useProjectsStore();
+  const { leaveProject, updateProjectSorting } = useProjectsStore();
 
   const handleLeaveProject = async (projectId: string, projectName: string) => {
     const id = projectId.split("-").slice(-5).join("-");
@@ -53,6 +54,19 @@ export function NavInvitedProjects({
     } catch {
       toast.error("Failed to leave project");
     }
+  };
+
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const items = Array.from(projects);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+
+    updateProjectSorting(
+      items.map((item) => item.id.split("-").slice(-5).join("-"))
+    );
   };
 
   return (
@@ -74,52 +88,69 @@ export function NavInvitedProjects({
         </Button>
       </div>
       {!isCollapsed && (
-        <SidebarMenu>
-          {projects.map((item) => (
-            <SidebarMenuItem key={item.id}>
-              <SidebarMenuButton asChild>
-                <Link
-                  href={item.url}
-                  className={cn({
-                    "bg-sidebar-accent": pathname === item.url,
-                    "text-sidebar-primary": pathname === item.url,
-                    "text-muted-foreground": pathname !== item.url,
-                    "flex items-center gap-2 p-2 rounded": true,
-                  })}
-                >
-                  <item.icon
-                    className={cn({
-                      "text-sidebar-primary": pathname === item.url,
-                      "text-muted-foreground": pathname !== item.url,
-                    })}
-                  />
-                  <span>{item.name}</span>
-                </Link>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-lg"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem
-                    onClick={() => handleLeaveProject(item.id, item.name)}
-                    className="cursor-pointer"
-                  >
-                    <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
-                    <span>Leave Project</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="invited-projects">
+            {(provided) => (
+              <SidebarMenu {...provided.droppableProps} ref={provided.innerRef}>
+                {projects.map((item, index) => (
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                    {(provided) => (
+                      <SidebarMenuItem
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <SidebarMenuButton asChild>
+                          <Link
+                            href={item.url}
+                            className={cn({
+                              "bg-sidebar-accent": pathname === item.url,
+                              "text-sidebar-primary": pathname === item.url,
+                              "text-muted-foreground": pathname !== item.url,
+                              "flex items-center gap-2 p-2 rounded": true,
+                            })}
+                          >
+                            <item.icon
+                              className={cn({
+                                "text-sidebar-primary": pathname === item.url,
+                                "text-muted-foreground": pathname !== item.url,
+                              })}
+                            />
+                            <span>{item.name}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <SidebarMenuAction showOnHover>
+                              <MoreHorizontal />
+                              <span className="sr-only">More</span>
+                            </SidebarMenuAction>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="w-48 rounded-lg"
+                            side={isMobile ? "bottom" : "right"}
+                            align={isMobile ? "end" : "start"}
+                          >
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleLeaveProject(item.id, item.name)
+                              }
+                              className="cursor-pointer"
+                            >
+                              <LogOut className="mr-2 h-4 w-4 text-muted-foreground" />
+                              <span>Leave Project</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </SidebarMenu>
+            )}
+          </Droppable>
+        </DragDropContext>
       )}
     </SidebarGroup>
   );

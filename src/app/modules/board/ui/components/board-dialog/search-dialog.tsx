@@ -1,4 +1,4 @@
-"use client"; //TODO
+"use client";
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,6 @@ export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
   const { myProjects, invitedProjects, loading } = useProjectsStore();
   const router = useRouter();
 
-  // Keyboard shortcut handler
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (
@@ -45,7 +44,6 @@ export function SearchDialog({ triggerContent, shortcut }: SearchDialogProps) {
     return () => document.removeEventListener("keydown", down);
   }, [shortcut]);
 
-  // Format and filter projects
   const searchTerm = searchQuery.toLowerCase().trim();
 
   const filteredNavigation = mainNavItems.filter((item) =>
