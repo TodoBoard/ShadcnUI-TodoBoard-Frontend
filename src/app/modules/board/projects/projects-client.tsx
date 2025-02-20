@@ -20,7 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Image from "next/image";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface TaskFormData {
   title: string;
@@ -116,7 +116,7 @@ export default function ProjectsClient() {
           ? `/user/avatar/${todo.avatar_id}.png`
           : avatarId
           ? `/user/avatar/${avatarId}.png`
-          : "/user/avatar/default.png",
+          : undefined,
       },
     };
   };
@@ -209,7 +209,7 @@ export default function ProjectsClient() {
           ? `/user/avatar/${todo.avatar_id}.png`
           : avatarId
           ? `/user/avatar/${avatarId}.png`
-          : "/user/avatar/default.png",
+          : undefined,
       },
     });
 
@@ -258,13 +258,15 @@ export default function ProjectsClient() {
           {teamMembers.map((member) => (
             <Tooltip key={member.id}>
               <TooltipTrigger asChild>
-                <Image
-                  className="rounded-full ring-2 ring-background w-8 h-8"
-                  src={`/user/avatar/${member.avatar_id}.png`}
-                  width={32}
-                  height={32}
-                  alt={member.username}
-                />
+                <Avatar className="ring-2 ring-background w-8 h-8">
+                  <AvatarImage 
+                    src={`/user/avatar/${member.avatar_id}.png`}
+                    alt={member.username}
+                  />
+                  <AvatarFallback>
+                    {member.username.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-sm">{member.username}</p>

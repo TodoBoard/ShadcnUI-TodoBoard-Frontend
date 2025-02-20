@@ -8,6 +8,7 @@ import { Todo } from "@/models/todos";
 import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
 import Image from "next/image";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function TodosClient() {
   const [username, setUsername] = useState<string>("");
@@ -41,9 +42,9 @@ export function TodosClient() {
       completed: todo.status === "done",
       creator: {
         name: isCurrentUser ? "You" : todo.username,
-        avatar: todo.avatar_id
-          ? `/user/avatar/${todo.avatar_id}.png`
-          : "/user/avatar/default.png",
+        avatar: todo.avatar_id 
+          ? `/user/avatar/${todo.avatar_id}.png` 
+          : undefined,
       },
     };
   };
@@ -75,17 +76,15 @@ export function TodosClient() {
     <div className="space-y-6 pb-4 pt-2">
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">Todos</h1>
-        <Image
-          className="rounded-full ring-2 ring-background"
-          src={
-            avatarId
-              ? `/user/avatar/${avatarId}.png`
-              : "/user/avatar/default.png"
-          }
-          width={32}
-          height={32}
-          alt={username}
-        />
+        <Avatar className="ring-2 ring-background w-8 h-8">
+          <AvatarImage 
+            src={avatarId ? `/user/avatar/${avatarId}.png` : undefined}
+            alt={username}
+          />
+          <AvatarFallback>
+            {username ? username.slice(0, 2).toUpperCase() : "U"}
+          </AvatarFallback>
+        </Avatar>
       </div>
 
       <div className="space-y-2">
