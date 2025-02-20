@@ -79,7 +79,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     invitedProjects,
     fetchProjects,
   } = useProjectsStore();
-  const { unreadCount, setUnreadCount } = useNotificationsStore();
+  const { unreadCount } = useNotificationsStore();
 
   useEffect(() => {
     const fetch = async () => {

@@ -96,8 +96,6 @@ function NotificationList({
   );
 }
 
-interface NotificationsListProps {}
-
 export function NotificationsList() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);

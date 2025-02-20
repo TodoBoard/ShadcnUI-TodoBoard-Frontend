@@ -5,6 +5,7 @@ import { CalendarCheck2, Eye, EyeOff, Check, X } from "lucide-react";
 import { useState, useId, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,6 @@ import {
 } from "@/utils/password-utils";
 
 type ResetStep = "check" | "password" | "otp";
-type PasswordRequirement = { regex: RegExp; text: string };
 
 const STEP_TITLES = {
   check: "Reset your password",
@@ -171,7 +171,7 @@ export function PasswordResetForm({
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a
+            <Link
               href="/"
               className="flex flex-col items-center gap-2 font-medium"
             >
@@ -179,13 +179,13 @@ export function PasswordResetForm({
                 <CalendarCheck2 className="size-6 text-primary" />
               </div>
               <span className="sr-only">TodoBoard</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">{STEP_TITLES[step]}</h1>
             <div className="text-center text-sm">
               Remember your password?{" "}
-              <a href="/auth/login" className="underline underline-offset-4">
+              <Link href="/auth/login" className="underline underline-offset-4">
                 Sign in
-              </a>
+              </Link>
             </div>
           </div>
 

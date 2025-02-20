@@ -7,6 +7,7 @@ import { TaskSkeletonList } from "@/app/modules/board/ui/components/projects/tas
 import { Todo } from "@/models/todos";
 import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
+import Image from "next/image";
 
 export function TodosClient() {
   const [username, setUsername] = useState<string>("");
@@ -55,6 +56,7 @@ export function TodosClient() {
         playTaskCompleteSound();
       }
     } catch (error) {
+      console.error("Failed to toggle task status:", error);
     }
   };
 
@@ -62,6 +64,7 @@ export function TodosClient() {
     try {
       await deleteTodo(todoId);
     } catch (error) {
+      console.error("Failed to delete task:", error);
     }
   };
 
@@ -72,8 +75,8 @@ export function TodosClient() {
     <div className="space-y-6 pb-4 pt-2">
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">Todos</h1>
-        <img
-          className="rounded-full ring-2 ring-background w-8 h-8"
+        <Image
+          className="rounded-full ring-2 ring-background"
           src={
             avatarId
               ? `/user/avatar/${avatarId}.png`

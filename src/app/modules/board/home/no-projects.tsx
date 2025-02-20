@@ -22,7 +22,7 @@ export function NoProjects() {
         <div className="space-y-2 text-center">
           <h3 className="text-xl font-semibold">No Projects Yet</h3>
           <p className="text-muted-foreground text-sm">
-            You haven't created or been invited to any projects.
+            You haven&apos;t created or been invited to any projects.
           </p>
         </div>
         <Button

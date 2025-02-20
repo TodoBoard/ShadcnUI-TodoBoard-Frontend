@@ -7,9 +7,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -19,7 +17,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,13 +32,11 @@ const MAX_PROJECT_NAME_LENGTH = 25;
 interface CreateProjectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  triggerContent?: React.ReactNode;
 }
 
 export function CreateProjectDialog({
   open,
   onOpenChange,
-  triggerContent,
 }: CreateProjectDialogProps) {
   const [projectName, setProjectName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -75,8 +70,9 @@ export function CreateProjectDialog({
       const slugName = slugify(response.name);
       const projectUrl = `/board/projects/my-projects/${slugName}-id=${response.id}`;
       router.push(projectUrl);
-    } catch (error) {
-      toast.error("Failed to create project");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create project";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
       setProjectName("");

@@ -2,7 +2,6 @@
 
 import {
   type LucideIcon,
-  Plus,
   ChevronRight,
   MoreHorizontal,
   LogOut,
@@ -51,7 +50,7 @@ export function NavInvitedProjects({
     try {
       await leaveProject(id);
       toast.success(`Left project ${projectName} successfully`);
-    } catch (error) {
+    } catch {
       toast.error("Failed to leave project");
     }
   };

@@ -18,6 +18,7 @@ import { Security } from "@/lib/api";
 import { ArrowRight, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import Image from "next/image";
 
 interface TwoFactorSetupDialogProps {
   open: boolean;
@@ -62,7 +63,7 @@ export function TwoFactorSetupDialog({
       const response = await Security.setupTwoFactor();
       setSetupData(response);
       setStep(1);
-    } catch (error) {
+    } catch {
       toast.error("Failed to setup 2FA");
     } finally {
       setIsLoading(false);
@@ -81,7 +82,7 @@ export function TwoFactorSetupDialog({
       toast.success("2FA enabled successfully");
       onSuccess();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Invalid verification code");
       setVerificationCode("");
     } finally {
@@ -121,7 +122,7 @@ export function TwoFactorSetupDialog({
 
           {step === 0 && (
             <div className="rounded-lg overflow-hidden">
-              <img
+              <Image
                 className="w-full"
                 src="/board/2fa.png"
                 width={382}

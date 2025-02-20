@@ -26,7 +26,8 @@ export function useProjectTitle() {
           .join(" ");
 
         setProjectTitle(formattedTitle);
-      } catch (error) {
+      } catch {
+        // Silently handle errors
       }
     };
 

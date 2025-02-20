@@ -18,7 +18,8 @@ export function useProjectId() {
         if (idMatch && idMatch[1]) {
           setProjectId(idMatch[1]);
         }
-      } catch (error) {
+      } catch {
+        // Silently handle errors
       }
     };
 

@@ -20,6 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Image from "next/image";
 
 interface TaskFormData {
   title: string;
@@ -30,11 +31,7 @@ interface TaskFormData {
 }
 
 export default function ProjectsClient() {
-  const today = new Date();
-  const [date, setDate] = useState<Date>();
-  const [time, setTime] = useState<string | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [formData, setFormData] = useState<TaskFormData>({
     title: "",
     description: "",
@@ -52,7 +49,6 @@ export default function ProjectsClient() {
   const projectTitle = useProjectTitle();
   const projectId = useProjectId();
   const {
-    todos,
     loading,
     error,
     fetchTodos,
@@ -85,41 +81,6 @@ export default function ProjectsClient() {
     }
   }, []);
 
-  // Mock time slots data
-  const timeSlots = [
-    { time: "09:00", available: true },
-    { time: "09:30", available: true },
-    { time: "10:00", available: true },
-    { time: "10:30", available: true },
-    { time: "11:00", available: true },
-    { time: "11:30", available: true },
-    { time: "12:00", available: true },
-    { time: "12:30", available: true },
-    { time: "13:00", available: true },
-    { time: "13:30", available: true },
-    { time: "14:00", available: true },
-    { time: "14:30", available: true },
-    { time: "15:00", available: true },
-    { time: "15:30", available: true },
-    { time: "16:00", available: true },
-    { time: "16:30", available: true },
-    { time: "17:00", available: true },
-    { time: "17:30", available: true },
-    { time: "18:00", available: true },
-    { time: "18:30", available: true },
-    { time: "19:00", available: true },
-    { time: "19:30", available: true },
-    { time: "20:00", available: true },
-    { time: "20:30", available: true },
-    { time: "21:00", available: true },
-    { time: "21:30", available: true },
-    { time: "22:00", available: true },
-    { time: "22:30", available: true },
-    { time: "23:00", available: true },
-    { time: "23:30", available: true },
-    { time: "00:00", available: true },
-  ];
-
   const initialFormData: TaskFormData = {
     title: "",
     description: "",
@@ -130,8 +91,6 @@ export default function ProjectsClient() {
 
   const resetForm = () => {
     setFormData(initialFormData);
-    setDate(undefined);
-    setTime(null);
   };
 
   const focusTitleInput = () => {
@@ -223,6 +182,7 @@ export default function ProjectsClient() {
         setIsFormVisible(false);
       }
     } catch (error) {
+      console.error('Error submitting task:', error);
     }
   };
 
@@ -268,6 +228,7 @@ export default function ProjectsClient() {
     try {
       await deleteTodo(todoId);
     } catch (error) {
+      console.error('Error deleting task:', error);
     }
   };
 
@@ -280,6 +241,7 @@ export default function ProjectsClient() {
         playTaskCompleteSound();
       }
     } catch (error) {
+      console.error('Error toggling task completion:', error);
     }
   };
 
@@ -296,7 +258,7 @@ export default function ProjectsClient() {
           {teamMembers.map((member) => (
             <Tooltip key={member.id}>
               <TooltipTrigger asChild>
-                <img
+                <Image
                   className="rounded-full ring-2 ring-background w-8 h-8"
                   src={`/user/avatar/${member.avatar_id}.png`}
                   width={32}

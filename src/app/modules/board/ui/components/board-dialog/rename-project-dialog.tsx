@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -71,8 +70,9 @@ export function RenameProjectDialog({
       await renameProject(projectId, trimmedName);
       toast.success("Project renamed successfully!");
       onOpenChange(false);
-    } catch (error) {
-      toast.error("Failed to rename project");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to rename project";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

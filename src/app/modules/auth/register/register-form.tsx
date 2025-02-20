@@ -15,6 +15,7 @@ import {
   checkPasswordStrength,
   getStrengthColor,
 } from "@/utils/password-utils";
+import Link from "next/link";
 
 export function RegisterForm({
   className,
@@ -69,7 +70,7 @@ export function RegisterForm({
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a
+            <Link
               href="/"
               className="flex flex-col items-center gap-2 font-medium"
             >
@@ -77,13 +78,13 @@ export function RegisterForm({
                 <CalendarCheck2 className="size-6 text-primary" />
               </div>
               <span className="sr-only">TodoBoard</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">Create your account</h1>
             <div className="text-center text-sm">
               Already have an account?{" "}
-              <a href="/auth/login" className="underline underline-offset-4">
+              <Link href="/auth/login" className="underline underline-offset-4">
                 Sign in
-              </a>
+              </Link>
             </div>
           </div>
           <div className="flex flex-col gap-6">

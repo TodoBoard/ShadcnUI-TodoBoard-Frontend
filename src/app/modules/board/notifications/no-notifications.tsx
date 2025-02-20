@@ -17,7 +17,7 @@ export function NoNotifications() {
       </div>
       <div className="space-y-2 text-center">
         <h3 className="text-xl font-semibold">No Notifications Yet</h3>
-        <p className="text-muted-foreground text-sm">You're all caught up!</p>
+        <p className="text-muted-foreground text-sm">You&apos;re all caught up!</p>
       </div>
       <Link href="/board/home">
         <Button size="lg" className="flex items-center gap-2 rounded-xl">

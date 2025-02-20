@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Users, Loader2, UserMinus, Check } from "lucide-react";
+import { Users, Loader2, UserMinus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -51,8 +51,9 @@ export function ManageTeamDialog({
       await Projects.removeTeamMember(projectId, member.id);
       toast.success(`${member.username} was removed from the project`);
       onTeamMemberRemoved();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to remove team member");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to remove team member";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(null);
     }

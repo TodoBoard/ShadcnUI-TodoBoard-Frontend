@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -52,7 +51,7 @@ export function TwoFactorDisableDialog({
       toast.success("2FA disabled successfully");
       onSuccess();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Invalid verification code");
       setCode("");
       inputRef.current?.focus();

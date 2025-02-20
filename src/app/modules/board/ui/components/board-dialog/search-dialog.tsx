@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Folder, Search, Home, Settings, UserPlus, Bell } from "lucide-react";
+import { Folder } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,

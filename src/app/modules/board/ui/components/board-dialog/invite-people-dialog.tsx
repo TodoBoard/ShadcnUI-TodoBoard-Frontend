@@ -49,6 +49,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "sonner";
 
 interface NavInvitePeopleDialogProps {
   triggerContent: React.ReactNode;
@@ -140,7 +141,9 @@ export function NavInvitePeopleDialog({
 
       const link = `${clientEnv.inviteUrl}${response.id}`;
       setInviteLink(link);
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate invite link";
+      toast.error(errorMessage);
     }
   };
 
@@ -163,7 +166,11 @@ export function NavInvitePeopleDialog({
           text: "Join our project on OriginUI",
           url: link,
         });
-      } catch (err) {
+      } catch (error: unknown) {
+        // Ignore share cancellation errors
+        if (error instanceof Error && error.name !== 'AbortError') {
+          toast.error("Failed to share link");
+        }
       }
     } else if (action.startsWith("mailto:") || action.startsWith("sms:")) {
       window.location.href = `${action}${encodeURIComponent(link)}`;

@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Calendar as CalendarIcon, Pencil, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 export interface Task {
   id: string;
@@ -123,10 +124,12 @@ export function TaskItem({
         <div className="flex justify-between items-center">
           <div />
           <div className="flex items-center gap-1.5">
-            <img
+            <Image
               src={task.creator.avatar}
               alt={task.creator.name}
-              className="w-4 h-4 rounded-full"
+              width={16}
+              height={16}
+              className="rounded-full"
             />
             <span className="text-xs text-gray-400">{task.creator.name}</span>
           </div>

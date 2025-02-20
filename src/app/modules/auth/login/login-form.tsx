@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Auth, handleApiError } from "@/lib/api";
 import type { LoginFormData } from "@/models/auth";
+import Link from "next/link";
 
 interface LoginFormProps extends React.ComponentPropsWithoutRef<"div"> {
   className?: string;
@@ -56,16 +57,16 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <header className="flex flex-col items-center gap-2">
-          <a href="/" className="flex flex-col items-center gap-2 font-medium">
+          <Link href="/" className="flex flex-col items-center gap-2 font-medium">
             <div className="flex h-8 w-8 items-center justify-center rounded-md">
               <CalendarCheck2 className="size-6 text-primary" />
             </div>
             <span className="sr-only">TodoBoard</span>
-          </a>
+          </Link>
           <h1 className="text-xl font-bold">Welcome to TodoBoard</h1>
           <p className="text-center text-sm">
             Don&apos;t have an account?{" "}
-            <a
+            <Link
               href={`/auth/register${
                 searchParams.get("redirect")
                   ? `?redirect=${searchParams.get("redirect")}`
@@ -74,7 +75,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               className="underline underline-offset-4"
             >
               Sign up
-            </a>
+            </Link>
           </p>
         </header>
 
@@ -96,13 +97,13 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor={passwordId}>Password</Label>
-              <a
+              <Link
                 href="/auth/reset-password"
                 className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4"
                 tabIndex={-1}
               >
                 Forgot Password?
-              </a>
+              </Link>
             </div>
             <div className="relative">
               <Input

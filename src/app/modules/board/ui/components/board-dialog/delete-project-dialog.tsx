@@ -2,16 +2,12 @@ import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -59,8 +55,9 @@ export function DeleteProjectDialog({
       } else {
         await handleDelete();
       }
-    } catch (error) {
-      toast.error("Failed to check 2FA status");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to check 2FA status";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -77,8 +74,9 @@ export function DeleteProjectDialog({
       await deleteProject(projectId, showOTPInput ? code : undefined);
       toast.success("Project deleted successfully");
       handleClose();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete project");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete project";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

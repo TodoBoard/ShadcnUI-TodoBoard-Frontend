@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { Todo, TodoCreate, TodoUpdateSchema } from "@/models/todos";
 import { Todos } from "@/lib/api";
-import { useProjectsStore } from "@/store/projects";
 
 type ErrorType = "NOT_FOUND" | "OTHER" | null;
 

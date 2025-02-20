@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Check, X, Loader2, CalendarCheck2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -71,11 +72,11 @@ export const Invite = () => {
       <div className="container flex min-h-screen max-w-md flex-col items-center justify-center">
         <Card className="w-full p-8">
           <div className="flex flex-col items-center gap-6">
-            <a href="/" className="flex flex-col items-center gap-2">
+            <Link href="/" className="flex flex-col items-center gap-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
                 <CalendarCheck2 className="h-6 w-6 text-destructive" />
               </div>
-            </a>
+            </Link>
 
             <div className="flex flex-col items-center gap-1 text-center">
               <h1 className="text-2xl font-semibold text-destructive">
@@ -129,11 +130,11 @@ export const Invite = () => {
       <div className="container flex min-h-screen max-w-md flex-col items-center justify-center">
         <Card className="w-full p-8">
           <div className="flex flex-col items-center gap-6">
-            <a href="/" className="flex flex-col items-center gap-2">
+            <Link href="/" className="flex flex-col items-center gap-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
                 <CalendarCheck2 className="h-6 w-6 text-destructive" />
               </div>
-            </a>
+            </Link>
 
             <div className="flex flex-col items-center gap-1 text-center">
               <h1 className="text-2xl font-semibold text-destructive">
@@ -183,11 +184,11 @@ export const Invite = () => {
     <div className="container flex min-h-screen max-w-md flex-col items-center justify-center">
       <Card className="w-full p-8">
         <div className="flex flex-col items-center gap-6">
-          <a href="/" className="flex flex-col items-center gap-2">
+          <Link href="/" className="flex flex-col items-center gap-2">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <CalendarCheck2 className="h-6 w-6 text-primary" />
             </div>
-          </a>
+          </Link>
 
           <div className="flex flex-col items-center gap-1 text-center">
             <h1 className="text-2xl font-semibold">Project Invitation</h1>
