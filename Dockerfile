@@ -1,4 +1,3 @@
-GNU nano 7.2                                                                                  Dockerfile                                                                                            
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -28,5 +27,3 @@ USER frontend
 EXPOSE 3000
 
 CMD ["npm", "start"]
-
-
