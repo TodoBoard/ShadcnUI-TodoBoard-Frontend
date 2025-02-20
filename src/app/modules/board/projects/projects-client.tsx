@@ -10,7 +10,10 @@ import { useProjectId } from "@/hooks/use-project-id";
 import { useTodosStore } from "@/store/todos";
 import { Todo, TodoCreate, TodoUpdateSchema } from "@/models/todos";
 import { useProjectsStore } from "@/store/projects";
-import { TaskItem, Task } from "@/app/modules/board/ui/components/projects/task-item";
+import {
+  TaskItem,
+  Task,
+} from "@/app/modules/board/ui/components/projects/task-item";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
 import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
 import { ErrorState } from "@/app/modules/board/ui/components/projects/projects-error-state";
@@ -57,6 +60,7 @@ export default function ProjectsClient() {
     deleteTodo,
     selectedProjectId,
     getProjectTodos,
+    setSelectedProjectId,
   } = useTodosStore();
   const { getCurrentProjectTeam } = useProjectsStore();
   const teamMembers = getCurrentProjectTeam(projectId);
@@ -66,8 +70,9 @@ export default function ProjectsClient() {
   useEffect(() => {
     if (projectId) {
       fetchTodos(projectId);
+      setSelectedProjectId(projectId);
     }
-  }, [projectId, fetchTodos]);
+  }, [projectId, fetchTodos, setSelectedProjectId]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -181,7 +186,7 @@ export default function ProjectsClient() {
         setIsFormVisible(false);
       }
     } catch (error) {
-      console.error('Error submitting task:', error);
+      console.error("Error submitting task:", error);
     }
   };
 
@@ -197,7 +202,7 @@ export default function ProjectsClient() {
       title: todo.title,
       description: todo.description,
       status: todo.status,
-      priority: todo.priority,
+      priority: todo.priority || undefined,
       due_date: todo.due_date,
       dueDate: dueDate,
       dueTime: dueTime,
@@ -217,7 +222,7 @@ export default function ProjectsClient() {
       description: todo.description,
       dueDate: dueDate,
       dueTime: dueTime,
-      priority: todo.priority,
+      priority: todo.priority || undefined,
     });
     setIsFormVisible(true);
     setTimeout(() => titleInputRef.current?.focus(), 0);
@@ -227,7 +232,7 @@ export default function ProjectsClient() {
     try {
       await deleteTodo(todoId);
     } catch (error) {
-      console.error('Error deleting task:', error);
+      console.error("Error deleting task:", error);
     }
   };
 
@@ -240,7 +245,7 @@ export default function ProjectsClient() {
         playTaskCompleteSound();
       }
     } catch (error) {
-      console.error('Error toggling task completion:', error);
+      console.error("Error toggling task completion:", error);
     }
   };
 
@@ -258,7 +263,7 @@ export default function ProjectsClient() {
             <Tooltip key={member.id}>
               <TooltipTrigger asChild>
                 <Avatar className="ring-2 ring-background w-8 h-8">
-                  <AvatarImage 
+                  <AvatarImage
                     src={`/user/avatar/${member.avatar_id}.png`}
                     alt={member.username}
                   />

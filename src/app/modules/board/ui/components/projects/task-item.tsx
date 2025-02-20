@@ -9,7 +9,7 @@ export interface Task {
   title: string;
   description: string;
   status: string;
-  priority: string;
+  priority: string | undefined;
   due_date: string | null;
   dueDate?: Date;
   dueTime?: string | null;
