@@ -4,9 +4,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, BellDot } from "lucide-react";
 import { useState } from "react";
-import { NotificationsList } from "./notifications";
+import { NotificationsList } from "../ui/components/notifications/notifications";
 
-export function NotificationsClient() {
+export function Notifications() {
   const [activeTab, setActiveTab] = useState("unread");
 
   return (

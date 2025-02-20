@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CreateProjectDialog } from "../ui/components/board-dialog/create-project-dialog";
+import { CreateProjectDialog } from "@/app/modules/board/ui/components/board-dialog/create-project-dialog";
 
 interface HeaderProps {
   className?: string;

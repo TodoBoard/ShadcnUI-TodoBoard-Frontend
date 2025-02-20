@@ -8,9 +8,10 @@ import { Todo } from "@/models/todos";
 import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ErrorState } from "@/app/modules/board/ui/components/projects/projects-error-state";
+import { ErrorState } from "@/app/modules/board/ui/components/error-state/error-state";
+import { NoTodos } from "@/app/modules/board/ui/components/todos/no-todos";
 
-export function TodosClient() {
+export function Todos() {
   const [username, setUsername] = useState<string>("");
   const [avatarId, setAvatarId] = useState<number | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
@@ -42,9 +43,7 @@ export function TodosClient() {
       completed: todo.status === "done",
       creator: {
         name: isCurrentUser ? "You" : todo.username,
-        avatar: todo.avatar_id 
-          ? `/user/avatar/${todo.avatar_id}.png` 
-          : "",
+        avatar: todo.avatar_id ? `/user/avatar/${todo.avatar_id}.png` : "",
       },
     };
   };
@@ -77,7 +76,7 @@ export function TodosClient() {
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">Todos</h1>
         <Avatar className="ring-2 ring-background w-8 h-8">
-          <AvatarImage 
+          <AvatarImage
             src={avatarId ? `/user/avatar/${avatarId}.png` : undefined}
             alt={username}
           />
@@ -95,6 +94,8 @@ export function TodosClient() {
             title="404 Todos Not Found"
             message="Failed to load your todos. Please try again later."
           />
+        ) : todos.length === 0 ? (
+          <NoTodos />
         ) : (
           <>
             {activeTodos.map((todo) => (

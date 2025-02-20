@@ -1,4 +1,4 @@
-import ProjectsClient from "@/app/modules/board/projects/projects-client";
+import { Projects } from "@/app/modules/board/projects/projects-client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,6 +7,6 @@ export const metadata: Metadata = {
 };
 
 export default function InvitedProjectsPage() {
-  return <ProjectsClient />;
+  return <Projects/>;
 }
 

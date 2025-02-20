@@ -1,4 +1,4 @@
-import { TodosClient } from "@/app/modules/board/todos/todos-client";
+import { Todos } from "@/app/modules/board/todos/todos-client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function TodosPage() {
-  return <TodosClient />;
+  return <Todos/>;
 }

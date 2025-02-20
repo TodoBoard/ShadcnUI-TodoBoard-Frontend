@@ -16,7 +16,7 @@ import {
 } from "@/app/modules/board/ui/components/projects/task-item";
 import { CompletedTasks } from "@/app/modules/board/ui/components/projects/completed-tasks";
 import { useTaskCompleteSound } from "@/hooks/use-task-complete-sound";
-import { ErrorState } from "@/app/modules/board/ui/components/projects/projects-error-state";
+import { ErrorState } from "@/app/modules/board/ui/components/error-state/error-state";
 import { TaskSkeletonList } from "@/app/modules/board/ui/components/projects/task-skeleton";
 import {
   Tooltip,
@@ -33,7 +33,7 @@ interface TaskFormData {
   priority: string | undefined;
 }
 
-export default function ProjectsClient() {
+export function Projects() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [formData, setFormData] = useState<TaskFormData>({
     title: "",

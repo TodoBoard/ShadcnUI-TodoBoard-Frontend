@@ -1,4 +1,4 @@
-import { NotificationsClient } from "@/app/modules/board/notifications/notifications-client";
+import { Notifications } from "@/app/modules/board/notifications/notifications-client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">Notifications</h1>
       </div>
-      <NotificationsClient />
+      <Notifications />
     </div>
   );
 }

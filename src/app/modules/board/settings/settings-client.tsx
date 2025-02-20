@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Security, handleApiError } from "@/lib/api";
 import { TwoFactorStatus } from "@/models/security";
-import { TwoFactorSetupDialog } from "@/app/modules/board/settings/two-factor-setup-dialog";
-import { TwoFactorDisableDialog } from "@/app/modules/board/settings/two-factor-disable-dialog";
+import { TwoFactorSetupDialog } from "@/app/modules/board/ui/components/board-dialog/two-factor-setup-dialog";
+import { TwoFactorDisableDialog } from "@/app/modules/board/ui/components/board-dialog/two-factor-disable-dialog";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { Skeleton } from "@/components/ui/skeleton";
 

@@ -124,7 +124,7 @@ export function TwoFactorSetupDialog({
             <div className="rounded-lg overflow-hidden">
               <Image
                 className="w-full"
-                src="/board/2fa.png"
+                src="/board/2fa/2fa.png"
                 width={382}
                 height={216}
                 alt="Two-factor authentication"

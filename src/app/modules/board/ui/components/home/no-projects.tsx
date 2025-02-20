@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
-import { CreateProjectDialog } from "../ui/components/board-dialog/create-project-dialog";
+import { CreateProjectDialog } from "@/app/modules/board/ui/components/board-dialog/create-project-dialog";
 
 export function NoProjects() {
   const [openDialog, setOpenDialog] = useState(false);
