@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { Search, Home, UserPlus, Settings } from "lucide-react";
+import { Search, Home, UserPlus, Settings, BookOpenCheck } from "lucide-react";
 import { useEffect } from "react";
 import { formatProjects } from "@/utils/format-projects";
 import { NavMyProjects } from "./nav-my-projects";
@@ -61,6 +61,11 @@ const mainNavItems = [//TODO
     title: "Settings",
     url: "/board/settings",
     icon: Settings,
+  },
+  {
+    title: "Todos",
+    url: "/board/todos",
+    icon: BookOpenCheck,
   },
 ];
 

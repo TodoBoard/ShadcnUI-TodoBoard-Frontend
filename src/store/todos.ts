@@ -17,6 +17,7 @@ interface TodosStore {
   updateTodo: (todoId: string, todo: TodoUpdateSchema) => Promise<void>;
   deleteTodo: (todoId: string) => Promise<void>;
   getProjectTodos: (projectId: string) => Todo[];
+  fetchAllTodos: () => Promise<void>;
 }
 
 export const useTodosStore = create<TodosStore>((set, get) => ({
@@ -87,6 +88,21 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
       const errorMessage =
         typeof error === "string" ? error : "Failed to delete todo";
       set({ error: "OTHER", errorMessage });
+    }
+  },
+
+  fetchAllTodos: async () => {
+    set({ loading: true, error: null, errorMessage: undefined });
+    try {
+      const response = await Todos.getAllTodos();
+      set({
+        todos: response.todos,
+        loading: false,
+      });
+    } catch (error) {
+      const errorMessage =
+        typeof error === "string" ? error : "Failed to fetch todos";
+      set({ error: "OTHER", errorMessage, loading: false });
     }
   },
 }));

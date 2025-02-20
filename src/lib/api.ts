@@ -312,6 +312,15 @@ export const Invites = {
 };
 
 export const Todos = {
+  getAllTodos: async (): Promise<TodoListResponse> => {
+    try {
+      const response = await api.get<TodoListResponse>("/todos");
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   getProjectTodos: async (projectId: string): Promise<TodoListResponse> => {
     try {
       const response = await api.get<TodoListResponse>(`/todos/${projectId}`);

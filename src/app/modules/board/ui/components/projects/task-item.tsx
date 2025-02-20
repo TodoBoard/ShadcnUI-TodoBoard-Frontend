@@ -22,8 +22,9 @@ export interface Task {
 interface TaskItemProps {
   task: Task;
   toggleTaskComplete: (id: string) => void;
-  onEdit: (task: Task) => void;
+  onEdit?: () => void;
   onDelete: (id: string) => void;
+  disableEdit?: boolean;
 }
 
 export function TaskItem({
@@ -31,6 +32,7 @@ export function TaskItem({
   toggleTaskComplete,
   onEdit,
   onDelete,
+  disableEdit,
 }: TaskItemProps) {
   return (
     <div>
@@ -95,12 +97,14 @@ export function TaskItem({
                 </span>
               </div>
             )}
-            <button
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-              onClick={() => onEdit(task)}
-            >
-              <Pencil className="w-3 h-3 text-gray-400 hover:text-gray-600" />
-            </button>
+            {!disableEdit && onEdit && (
+              <button
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                onClick={onEdit}
+              >
+                <Pencil className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+              </button>
+            )}
             <button
               className="p-1 hover:bg-gray-100 rounded-full transition-colors"
               onClick={() => onDelete(task.id)}

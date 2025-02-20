@@ -8,8 +8,9 @@ interface CompletedTasksProps {
   completedTodos: Todo[];
   transformTodoToTask: (todo: Todo) => Task;
   toggleTaskComplete: (todo: Todo) => void;
-  handleEditTask: (todo: Todo) => void;
+  handleEditTask?: (todo: Todo) => void;
   handleDeleteTask: (id: string) => void;
+  disableEdit?: boolean;
 }
 
 export function CompletedTasks({
@@ -20,6 +21,7 @@ export function CompletedTasks({
   toggleTaskComplete,
   handleEditTask,
   handleDeleteTask,
+  disableEdit = false,
 }: CompletedTasksProps) {
   return (
     <div className="mt-6">
@@ -60,8 +62,13 @@ export function CompletedTasks({
               key={todo.id}
               task={transformTodoToTask(todo)}
               toggleTaskComplete={() => toggleTaskComplete(todo)}
-              onEdit={() => handleEditTask(todo)}
+              onEdit={
+                !disableEdit && handleEditTask
+                  ? () => handleEditTask(todo)
+                  : undefined
+              }
               onDelete={() => handleDeleteTask(todo.id)}
+              disableEdit={disableEdit}
             />
           ))}
         </div>
