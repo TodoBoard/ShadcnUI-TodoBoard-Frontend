@@ -121,3 +121,16 @@ body {
 .animate-scale-pulse {
   animation: scale-pulse cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+@layer components {
+  .homepage-container {
+    @apply w-full mx-auto;
+    padding: 1rem;
+  }
+
+  @screen 2xl {
+    .homepage-container {
+      max-width: 1400px;
+    }
+  }
+}
