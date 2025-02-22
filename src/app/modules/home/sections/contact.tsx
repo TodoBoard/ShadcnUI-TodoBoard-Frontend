@@ -59,7 +59,7 @@ export const ContactSection = () => {
   }
 
   return (
-    <section id="contact" className="homepage-container py-10 sm:py-20">
+    <section id="contact" className="homepage-container py-10 sm:py-15">
       <Separator className="mb-20" />
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -67,10 +67,15 @@ export const ContactSection = () => {
             <h2 className="text-5xl md:text-6xl font-extrabold">
               <span className="relative">
                 <span className="text-gradient bg-gradient-to-r from-[#D247BF] to-primary bg-clip-text">
-                  Connect With Us
+                  <span className="md:hidden">
+                    Connect
+                    <br />
+                    With Us
+                  </span>
+                  <span className="hidden md:inline">Connect With Us</span>
                 </span>
                 <svg
-                  className="absolute -bottom-2 w-full left-0"
+                  className="absolute -bottom-5 w-full left-0"
                   viewBox="0 0 200 8"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

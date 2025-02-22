@@ -23,7 +23,7 @@ export function HomeFooter() {
 
             <div className="flex flex-col items-center sm:items-start gap-2">
               <span className="text-sm text-muted-foreground">
-                © {currentYear} TodoBoard. All rights reserved.
+                © {currentYear} TodoBoard
               </span>
               <Link
                 href="/terms"
