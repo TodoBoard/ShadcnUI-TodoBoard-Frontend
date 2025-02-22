@@ -157,8 +157,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
         <footer className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
           By clicking continue, you agree to our{" "}
-          <a href="/terms">Terms of Service</a> and{" "}
-          <a href="/privacy">Privacy Policy</a>.
+          <a href="/terms">Terms of Service</a>
         </footer>
       </form>
     </div>

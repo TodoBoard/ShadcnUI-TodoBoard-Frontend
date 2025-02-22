@@ -29,6 +29,7 @@ import {
   TodoUpdateSchema,
   TodoResponse,
 } from "@/models/todos";
+import { Form } from "@/models/form";
 
 const api = axios.create({
   baseURL: clientEnv.apiUrl,
@@ -373,6 +374,15 @@ export const Todos = {
       throw handleApiError(error);
     }
   },
+};
+
+export const submitForm = async (form: Form): Promise<{ message: string }> => {
+  try {
+    const response = await api.post<{ message: string }>("/form/submit", form);
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
 };
 
 export default api;

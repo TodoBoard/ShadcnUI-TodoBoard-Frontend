@@ -163,7 +163,7 @@ export function NavInvitePeopleDialog({
       try {
         await navigator.share({
           title: "Project Invitation",
-          text: "Join our project on OriginUI",
+          text: "Join our project on TodoBoard",
           url: link,
         });
       } catch (error: unknown) {

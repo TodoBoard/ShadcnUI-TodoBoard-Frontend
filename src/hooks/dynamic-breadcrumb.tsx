@@ -77,7 +77,7 @@ export const DynamicBreadcrumb = () => {
         </BreadcrumbItem>
 
         {segments.map((segment, index) => {
-          if (segment === "board" || segment === "projects" || segment === "home") return null;
+          if (segment === "board" || segment === "projects" || segment === "home" || segment === "my-projects" || segment === "invited-projects") return null;
           const path = `/${segments.slice(0, index + 1).join("/")}`;
           const isLast = index === segments.length - 1;
 
