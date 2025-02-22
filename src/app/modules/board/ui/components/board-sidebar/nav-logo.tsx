@@ -15,7 +15,7 @@ export function NavLogo({ notificationCount }: NavLogoProps) {
     <SidebarMenu>
       <SidebarMenuItem>
         <div className="flex w-full items-center justify-between px-2 mt-2">
-          <a href="/board/home" className="flex items-center gap-3">
+          <a href="/" className="flex items-center gap-3">
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
               <CalendarCheck2 className="size-4" />
             </div>
