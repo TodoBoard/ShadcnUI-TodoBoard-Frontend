@@ -23,6 +23,8 @@ import { PrioritySelect } from "./priority-select";
 import { useRef, useEffect } from "react";
 import { useProjectsStore } from "@/store/projects";
 import { useTodosStore } from "@/store/todos";
+import { Send } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TaskFormData {
   title: string;
@@ -52,6 +54,7 @@ export function TaskForm({
   const titleInputRef = useRef<HTMLInputElement>(null);
   const { myProjects, invitedProjects } = useProjectsStore();
   const { selectedProjectId, setSelectedProjectId } = useTodosStore();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!selectedProjectId) {
@@ -142,17 +145,25 @@ export function TaskForm({
           </Select>
 
           <div className="flex gap-1.5">
-            <Button
-              type="button"
-              onClick={onCancel}
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
-            >
-              Cancel
-            </Button>
+            {!isMobile && (
+              <Button
+                type="button"
+                onClick={onCancel}
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+              >
+                Cancel
+              </Button>
+            )}
             <Button type="submit" size="sm" className="h-7 text-xs">
-              {isEditing ? "Save changes" : "Add task"}
+              {isMobile ? (
+                <Send className="h-4 w-4" />
+              ) : isEditing ? (
+                "Save changes"
+              ) : (
+                "Add task"
+              )}
             </Button>
           </div>
         </TaskCardFooter>

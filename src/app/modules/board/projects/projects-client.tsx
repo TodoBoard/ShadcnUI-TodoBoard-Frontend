@@ -24,6 +24,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 
 interface TaskFormData {
   title: string;
@@ -66,6 +77,8 @@ export function Projects() {
   const teamMembers = getCurrentProjectTeam(projectId);
 
   const currentProjectTodos = getProjectTodos(projectId);
+
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (projectId) {
@@ -254,6 +267,52 @@ export function Projects() {
     setTimeout(() => titleInputRef.current?.focus(), 0);
   };
 
+  const taskFormContent = (
+    <TaskForm
+      formData={formData}
+      onSubmit={handleSubmit}
+      onChange={setFormData}
+      onCancel={() => {
+        setIsFormVisible(false);
+        resetForm();
+      }}
+      currentProjectId={projectId}
+    />
+  );
+
+  const renderTaskForm = () => {
+    if (isMobile) {
+      return (
+        <Drawer open={isFormVisible} onOpenChange={setIsFormVisible}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>
+                {editingTask ? "Edit Task" : "Add New Task"}
+              </DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4">{taskFormContent}</div>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={() => {
+                    setIsFormVisible(false);
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      );
+    }
+
+    return taskFormContent;
+  };
+
   return (
     <div className="space-y-6 pb-4 pt-2">
       <div className="flex items-center justify-between">
@@ -299,19 +358,7 @@ export function Projects() {
               .filter((todo) => todo.status !== "done")
               .map((todo) =>
                 editingTask?.id === todo.id ? (
-                  <TaskForm
-                    key={todo.id}
-                    formData={formData}
-                    onSubmit={handleSubmit}
-                    onChange={setFormData}
-                    onCancel={() => {
-                      setEditingTask(null);
-                      resetForm();
-                      setIsFormVisible(false);
-                    }}
-                    isEditing
-                    currentProjectId={projectId}
-                  />
+                  renderTaskForm()
                 ) : (
                   <TaskItem
                     key={todo.id}
@@ -351,18 +398,7 @@ export function Projects() {
               </button>
             )}
 
-            {!editingTask && isFormVisible && (
-              <TaskForm
-                formData={formData}
-                onSubmit={handleSubmit}
-                onChange={setFormData}
-                onCancel={() => {
-                  setIsFormVisible(false);
-                  resetForm();
-                }}
-                currentProjectId={projectId}
-              />
-            )}
+            {!editingTask && isFormVisible && renderTaskForm()}
 
             {!isFormVisible &&
               !editingTask &&
