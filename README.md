@@ -1,5 +1,5 @@
 # TodoBoard Frontend
---> Preview: https://todoboard.net
+--> Live Preview: https://todoboard.net
 
 TodoBoard Frontend is a modern, responsive web application built with Next.js, Tailwind CSS, TypeScript, and Shadcn UI for a seamless user experience in managing tasks and projects. It integrates with the [FastAPI-TodoBoard-Backend](https://github.com/TodoBoard/FastAPI-TodoBoard-Backend) API.
 
