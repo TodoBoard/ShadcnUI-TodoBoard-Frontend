@@ -283,7 +283,16 @@ export function Projects() {
   const renderTaskForm = () => {
     if (isMobile) {
       return (
-        <Drawer open={isFormVisible} onOpenChange={setIsFormVisible}>
+        <Drawer
+          open={isFormVisible}
+          onOpenChange={(open) => {
+            setIsFormVisible(open);
+            if (!open) {
+              setEditingTask(null);
+              resetForm();
+            }
+          }}
+        >
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>
@@ -298,6 +307,7 @@ export function Projects() {
                   className="rounded-xl"
                   onClick={() => {
                     setIsFormVisible(false);
+                    setEditingTask(null);
                     resetForm();
                   }}
                 >
@@ -310,7 +320,7 @@ export function Projects() {
       );
     }
 
-    return taskFormContent;
+    return isFormVisible && taskFormContent;
   };
 
   return (
@@ -353,22 +363,20 @@ export function Projects() {
             message="The project you're looking for doesn't exist or you don't have access to it."
           />
         ) : (
-          <>
+          <div className="space-y-2">
             {currentProjectTodos
               .filter((todo) => todo.status !== "done")
-              .map((todo) =>
-                editingTask?.id === todo.id ? (
-                  renderTaskForm()
-                ) : (
-                  <TaskItem
-                    key={todo.id}
-                    task={transformTodoToTask(todo)}
-                    toggleTaskComplete={() => toggleTaskComplete(todo)}
-                    onEdit={() => handleEditTask(todo)}
-                    onDelete={() => handleDeleteTask(todo.id)}
-                  />
-                )
-              )}
+              .map((todo) => (
+                <TaskItem
+                  key={todo.id}
+                  task={transformTodoToTask(todo)}
+                  toggleTaskComplete={() => toggleTaskComplete(todo)}
+                  onEdit={() => handleEditTask(todo)}
+                  onDelete={() => handleDeleteTask(todo.id)}
+                />
+              ))}
+
+            {renderTaskForm()}
 
             {currentProjectTodos.some((todo) => todo.status === "done") && (
               <CompletedTasks
@@ -398,8 +406,6 @@ export function Projects() {
               </button>
             )}
 
-            {!editingTask && isFormVisible && renderTaskForm()}
-
             {!isFormVisible &&
               !editingTask &&
               currentProjectTodos.length === 0 &&
@@ -412,7 +418,7 @@ export function Projects() {
                   }}
                 />
               )}
-          </>
+          </div>
         )}
       </div>
     </div>
