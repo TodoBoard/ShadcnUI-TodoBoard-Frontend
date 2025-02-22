@@ -21,6 +21,10 @@ interface ProjectsStore {
   deleteProject: (projectId: string, totpCode?: string) => Promise<void>;
   getCurrentProjectTeam: (projectId: string) => TeamMember[];
   updateProjectSorting: (projectIds: string[]) => Promise<void>;
+  updateLocalProjectSorting: (
+    projectIds: string[],
+    type: "my" | "invited"
+  ) => void;
 }
 
 export const useProjectsStore = create<ProjectsStore>((set, get) => ({
@@ -96,16 +100,25 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
   updateProjectSorting: async (projectIds: string[]) => {
     try {
       await Projects.updateProjectSorting(projectIds);
-      const currentProjects = [...get().myProjects];
-      const sortedProjects = projectIds
-        .map((id) => currentProjects.find((p) => p.id === id))
-        .filter((p): p is Project => p !== undefined);
-
-      set({ myProjects: sortedProjects });
     } catch (error) {
       const errorMessage =
         typeof error === "string" ? error : "Failed to update project sorting";
       set({ error: true, errorMessage });
+      await get().fetchProjects();
     }
+  },
+  updateLocalProjectSorting: (projectIds: string[], type: "my" | "invited") => {
+    const currentProjects =
+      type === "my" ? [...get().myProjects] : [...get().invitedProjects];
+
+    const sortedProjects = projectIds
+      .map((id) => currentProjects.find((p) => p.id === id))
+      .filter((p): p is Project => p !== undefined);
+
+    set(
+      type === "my"
+        ? { myProjects: sortedProjects }
+        : { invitedProjects: sortedProjects }
+    );
   },
 }));

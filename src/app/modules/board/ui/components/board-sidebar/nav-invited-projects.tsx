@@ -44,7 +44,8 @@ export function NavInvitedProjects({
   const { isMobile } = useSidebar();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
-  const { leaveProject, updateProjectSorting } = useProjectsStore();
+  const { leaveProject, updateProjectSorting, updateLocalProjectSorting } =
+    useProjectsStore();
 
   const handleLeaveProject = async (projectId: string, projectName: string) => {
     const id = projectId.split("-").slice(-5).join("-");
@@ -56,17 +57,22 @@ export function NavInvitedProjects({
     }
   };
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async (result: any) => {
     if (!result.destination) return;
 
     const items = Array.from(projects);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-
-    updateProjectSorting(
-      items.map((item) => item.id.split("-").slice(-5).join("-"))
+    const projectIds = items.map((item) =>
+      item.id.split("-").slice(-5).join("-")
     );
+
+    // Update UI immediately with type 'invited'
+    updateLocalProjectSorting(projectIds, "invited");
+
+    // Then sync with backend
+    await updateProjectSorting(projectIds);
   };
 
   return (

@@ -52,7 +52,8 @@ export function NavMyProjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
-  const { fetchProjects, updateProjectSorting } = useProjectsStore();
+  const { fetchProjects, updateProjectSorting, updateLocalProjectSorting } =
+    useProjectsStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const pathname = usePathname();
@@ -66,16 +67,22 @@ export function NavMyProjects({
   >(null);
   const [openManageTeamDialog, setOpenManageTeamDialog] = useState(false);
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async (result: any) => {
     if (!result.destination) return;
 
     const items = Array.from(projects);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    updateProjectSorting(
-      items.map((item) => item.id.split("-").slice(-5).join("-"))
+    const projectIds = items.map((item) =>
+      item.id.split("-").slice(-5).join("-")
     );
+
+    // Update UI immediately with type 'my'
+    updateLocalProjectSorting(projectIds, "my");
+
+    // Then sync with backend
+    await updateProjectSorting(projectIds);
   };
 
   return (
