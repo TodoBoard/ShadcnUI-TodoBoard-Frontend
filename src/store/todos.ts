@@ -17,6 +17,7 @@ interface TodosStore {
   deleteTodo: (todoId: string) => Promise<void>;
   getProjectTodos: (projectId: string) => Todo[];
   fetchAllTodos: () => Promise<void>;
+  silentlyRefreshTodos: (projectId: string) => Promise<void>;
 }
 
 export const useTodosStore = create<TodosStore>((set, get) => ({
@@ -104,4 +105,27 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
       set({ error: "OTHER", errorMessage, loading: false });
     }
   },
+
+  silentlyRefreshTodos: async (projectId: string) => {
+    try {
+      const response = await Todos.getProjectTodos(projectId);
+      set((state) => ({
+        todos: state.todos
+          .map((todo) => {
+            const updated = response.todos.find((t) => t.id === todo.id);
+            return updated || todo;
+          })
+          .concat(
+            response.todos.filter(
+              (newTodo) => !state.todos.some((t) => t.id === newTodo.id)
+            )
+          ),
+      }));
+    } catch (error) {
+      const errorMessage =
+        typeof error === "string" ? error : "Failed to fetch todos";
+      set({ error: "OTHER", errorMessage, loading: false });
+    }
+  },
 }));
+

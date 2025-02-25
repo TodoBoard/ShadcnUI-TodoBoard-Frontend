@@ -65,6 +65,7 @@ export function Projects() {
     loading,
     error,
     fetchTodos,
+    silentlyRefreshTodos,
     createTodo,
     updateTodo,
     deleteTodo,
@@ -83,8 +84,17 @@ export function Projects() {
     if (projectId) {
       fetchTodos(projectId);
       setSelectedProjectId(projectId);
+
+      // Set up auto-refresh interval with silent refresh
+      const refreshInterval = setInterval(() => {
+        if (projectId) {
+          silentlyRefreshTodos(projectId);
+        }
+      }, 30000);
+
+      return () => clearInterval(refreshInterval);
     }
-  }, [projectId, fetchTodos, setSelectedProjectId]);
+  }, [projectId, fetchTodos, silentlyRefreshTodos, setSelectedProjectId]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
