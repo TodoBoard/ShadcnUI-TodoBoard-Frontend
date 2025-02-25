@@ -243,6 +243,12 @@ export function Projects() {
   const handleDeleteTask = async (todoId: string) => {
     try {
       await deleteTodo(todoId);
+
+      if (editingTask && editingTask.id === todoId) {
+        setEditingTask(null);
+        setIsFormVisible(false);
+        resetForm();
+      }
     } catch (error) {
       console.error("Error deleting task:", error);
     }
