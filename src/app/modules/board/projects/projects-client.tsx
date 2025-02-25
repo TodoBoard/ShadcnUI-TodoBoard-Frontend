@@ -193,7 +193,11 @@ export function Projects() {
       resetForm();
 
       if (!editingTask) {
-        focusTitleInput();
+        if (isMobile) {
+          setIsFormVisible(false);
+        } else {
+          focusTitleInput();
+        }
       } else {
         setIsFormVisible(false);
       }
