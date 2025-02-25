@@ -354,13 +354,13 @@ export function Projects() {
             title="404 Project Not Found"
             message="Invalid project URL. Please check the URL and try again."
           />
-        ) : loading ? (
-          <TaskSkeletonList />
         ) : error ? (
           <ErrorState
             title="404 Project Not Found"
             message="The project you're looking for doesn't exist or you don't have access to it."
           />
+        ) : loading ? (
+          <TaskSkeletonList />
         ) : (
           <div className="space-y-2">
             {currentProjectTodos
@@ -407,9 +407,7 @@ export function Projects() {
 
             {!isFormVisible &&
               !editingTask &&
-              currentProjectTodos.length === 0 &&
-              !loading &&
-              !error && (
+              currentProjectTodos.length === 0 && (
                 <NoTasks
                   onAddTask={() => {
                     setIsFormVisible(true);
