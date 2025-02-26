@@ -58,6 +58,7 @@ export function Projects() {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [username, setUsername] = useState<string>("");
   const [avatarId, setAvatarId] = useState<number | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
 
   const projectTitle = useProjectTitle();
   const projectId = useProjectId();
@@ -85,7 +86,6 @@ export function Projects() {
       fetchTodos(projectId);
       setSelectedProjectId(projectId);
 
-      // Set up auto-refresh interval with silent refresh
       const refreshInterval = setInterval(() => {
         if (projectId) {
           silentlyRefreshTodos(projectId);
@@ -196,6 +196,7 @@ export function Projects() {
 
         await updateTodo(editingTask.id, updateData);
         setEditingTask(null);
+        setEditingTaskId(null);
       } else {
         await createTodo(todoData as TodoCreate);
       }
@@ -223,7 +224,7 @@ export function Projects() {
         ? format(dueDate, "HH:mm")
         : null;
 
-    setEditingTask({
+    const taskToEdit = {
       id: todo.id,
       title: todo.title,
       description: todo.description,
@@ -241,7 +242,10 @@ export function Projects() {
           ? `/user/avatar/${avatarId}.png`
           : "",
       },
-    });
+    };
+
+    setEditingTask(taskToEdit);
+    setEditingTaskId(todo.id);
 
     setFormData({
       title: todo.title,
@@ -250,7 +254,11 @@ export function Projects() {
       dueTime: dueTime,
       priority: todo.priority || undefined,
     });
-    setIsFormVisible(true);
+
+    if (isMobile) {
+      setIsFormVisible(true);
+    }
+
     setTimeout(() => titleInputRef.current?.focus(), 0);
   };
 
@@ -308,6 +316,7 @@ export function Projects() {
             setIsFormVisible(open);
             if (!open) {
               setEditingTask(null);
+              setEditingTaskId(null);
               resetForm();
             }
           }}
@@ -327,6 +336,7 @@ export function Projects() {
                   onClick={() => {
                     setIsFormVisible(false);
                     setEditingTask(null);
+                    setEditingTaskId(null);
                     resetForm();
                   }}
                 >
@@ -385,15 +395,35 @@ export function Projects() {
           <div className="space-y-2">
             {currentProjectTodos
               .filter((todo) => todo.status !== "done")
-              .map((todo) => (
-                <TaskItem
-                  key={todo.id}
-                  task={transformTodoToTask(todo)}
-                  toggleTaskComplete={() => toggleTaskComplete(todo)}
-                  onEdit={() => handleEditTask(todo)}
-                  onDelete={() => handleDeleteTask(todo.id)}
-                />
-              ))}
+              .map((todo) => {
+                if (!isMobile && editingTaskId === todo.id) {
+                  return (
+                    <TaskForm
+                      key={todo.id}
+                      formData={formData}
+                      onSubmit={handleSubmit}
+                      onChange={setFormData}
+                      onCancel={() => {
+                        setEditingTask(null);
+                        setEditingTaskId(null);
+                        resetForm();
+                      }}
+                      currentProjectId={projectId}
+                      isEditing={true}
+                    />
+                  );
+                }
+
+                return (
+                  <TaskItem
+                    key={todo.id}
+                    task={transformTodoToTask(todo)}
+                    toggleTaskComplete={() => toggleTaskComplete(todo)}
+                    onEdit={() => handleEditTask(todo)}
+                    onDelete={() => handleDeleteTask(todo.id)}
+                  />
+                );
+              })}
 
             {renderTaskForm()}
 
