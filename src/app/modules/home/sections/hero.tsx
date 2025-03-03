@@ -72,30 +72,34 @@ export const HeroSection = () => {
           </p>
 
           <div className="space-y-4 md:space-y-0 md:space-x-4 flex flex-col md:flex-row justify-center items-center">
-            <Button className="w-5/6 md:w-1/4 font-bold group/arrow rounded-xl bg-primary hover:bg-primary/90">
-              <Link
-                aria-label="Try it out"
-                href="/auth/login"
-                className="flex items-center gap-2"
-              >
-                Try it out
-                <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="w-5/6 md:w-1/4 font-bold group/arrow rounded-xl border-2 hover:bg-neutral-100 dark:hover:bg-neutral-900"
+            <Link
+              aria-label="Try it out"
+              href="/auth/login"
+              className="w-5/6 md:w-1/4"
             >
-              <Link
-                aria-label="GitHub"
-                href="https://github.com/TodoBoard"
-                target="_blank"
+              <Button className="w-full font-bold group/arrow rounded-xl bg-primary hover:bg-primary/90">
+                <span className="flex items-center gap-2">
+                  Try it out
+                  <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
+                </span>
+              </Button>
+            </Link>
+            <Link
+              aria-label="GitHub"
+              href="https://github.com/TodoBoard"
+              target="_blank"
+              className="w-5/6 md:w-1/4"
+            >
+              <Button
+                variant="outline"
+                className="w-full font-bold group/arrow rounded-xl border-2 hover:bg-neutral-100 dark:hover:bg-neutral-900"
               >
-                <GithubIcon className="mr-2 size-5" />
-                GitHub
-              </Link>
-            </Button>
+                <span className="flex items-center">
+                  <GithubIcon className="mr-2 size-5" />
+                  GitHub
+                </span>
+              </Button>
+            </Link>
           </div>
         </div>
 
