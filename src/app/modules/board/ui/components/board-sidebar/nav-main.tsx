@@ -17,6 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { useSidebarMobileClose } from "@/hooks/use-sidebar-mobile-close";
 import { mainNavItems, type NavigationItem } from "@/config/navigation";
 
 interface NavItem extends NavigationItem {
@@ -28,6 +29,8 @@ interface NavItem extends NavigationItem {
 }
 
 function LinkNavItem({ item }: { item: NavItem & { url: string } }) {
+  const handleMobileItemClick = useSidebarMobileClose();
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
@@ -36,12 +39,11 @@ function LinkNavItem({ item }: { item: NavItem & { url: string } }) {
           item.isActive ? "bg-sidebar-accent text-sidebar-primary" : undefined
         }
       >
-        <Link href={item.url}>
+        <Link href={item.url} onClick={handleMobileItemClick}>
           {item.icon && (
             <item.icon
-              className={`size-4 ${
-                item.isActive ? "text-sidebar-primary" : "text-muted-foreground"
-              }`}
+              className={`size-4 ${item.isActive ? "text-sidebar-primary" : "text-muted-foreground"
+                }`}
             />
           )}
           <span>{item.title}</span>
@@ -58,6 +60,8 @@ function LinkNavItem({ item }: { item: NavItem & { url: string } }) {
 }
 
 function DialogNavItem({ item }: { item: NavItem }) {
+  const handleMobileItemClick = useSidebarMobileClose();
+
   const triggerContent = (
     <SidebarMenuButton
       asChild
@@ -65,12 +69,11 @@ function DialogNavItem({ item }: { item: NavItem }) {
         item.isActive ? "bg-sidebar-accent text-sidebar-primary" : undefined
       }
     >
-      <button type="button">
+      <button type="button" onClick={handleMobileItemClick}>
         {item.icon && (
           <item.icon
-            className={`size-4 ${
-              item.isActive ? "text-sidebar-primary" : "text-muted-foreground"
-            }`}
+            className={`size-4 ${item.isActive ? "text-sidebar-primary" : "text-muted-foreground"
+              }`}
           />
         )}
         <span>{item.title}</span>
@@ -94,6 +97,8 @@ function DialogNavItem({ item }: { item: NavItem }) {
 }
 
 function CollapsibleNavItem({ item }: { item: NavItem }) {
+  const handleMobileItemClick = useSidebarMobileClose();
+
   return (
     <Collapsible
       asChild
@@ -113,7 +118,7 @@ function CollapsibleNavItem({ item }: { item: NavItem }) {
             {item.items?.map((subItem) => (
               <SidebarMenuSubItem key={subItem.title}>
                 <SidebarMenuSubButton asChild>
-                  <Link href={subItem.url}>
+                  <Link href={subItem.url} onClick={handleMobileItemClick}>
                     <span>{subItem.title}</span>
                   </Link>
                 </SidebarMenuSubButton>

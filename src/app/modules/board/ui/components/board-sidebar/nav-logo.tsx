@@ -6,17 +6,20 @@ import { NotificationBell } from "./notification-bell";
 import Link from "next/link";
 
 import { SidebarMenu, SidebarMenuItem } from "@/components/ui/sidebar";
+import { useSidebarMobileClose } from "@/hooks/use-sidebar-mobile-close";
 
 interface NavLogoProps {
   notificationCount: number;
 }
 
 export function NavLogo({ notificationCount }: NavLogoProps) {
+  const handleMobileItemClick = useSidebarMobileClose();
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <div className="flex w-full items-center justify-between px-2 mt-2">
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3" onClick={handleMobileItemClick}>
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
               <CalendarCheck2 className="size-4" />
             </div>

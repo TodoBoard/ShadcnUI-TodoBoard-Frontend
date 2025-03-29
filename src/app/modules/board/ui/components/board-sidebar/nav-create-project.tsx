@@ -7,10 +7,12 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { useSidebarMobileClose } from "@/hooks/use-sidebar-mobile-close";
 import { CreateProjectDialog } from "../board-dialog/create-project-dialog";
 
 export function NavCreateProject() {
   const [open, setOpen] = useState(false);
+  const handleMobileItemClick = useSidebarMobileClose();
 
   return (
     <>
@@ -19,7 +21,10 @@ export function NavCreateProject() {
           <SidebarMenuButton
             size="lg"
             className="justify-center"
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              handleMobileItemClick();
+              setOpen(true);
+            }}
           >
             <Plus className="size-5" />
             <span className="text-sm font-medium">New Project</span>

@@ -43,6 +43,7 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd";
+import { useSidebarMobileClose } from "@/hooks/use-sidebar-mobile-close";
 
 export function NavMyProjects({
   projects,
@@ -57,6 +58,7 @@ export function NavMyProjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
+  const handleMobileItemClick = useSidebarMobileClose();
   const { fetchProjects, updateProjectSorting, updateLocalProjectSorting } =
     useProjectsStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -143,6 +145,7 @@ export function NavMyProjects({
                               "text-muted-foreground": pathname !== item.url,
                               "flex items-center gap-2 p-2 rounded": true,
                             })}
+                            onClick={handleMobileItemClick}
                           >
                             <item.icon
                               className={cn({
