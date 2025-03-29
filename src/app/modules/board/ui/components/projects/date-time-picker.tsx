@@ -11,6 +11,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 
 const timeSlots = [
   { time: "00:30", available: true },
@@ -76,14 +78,17 @@ export function DateTimePicker({
   onTimeChange,
 }: DateTimePickerProps) {
   const today = new Date();
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen} modal={isMobile}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           size="sm"
           className="h-7 text-xs justify-start text-left font-normal shadow-none"
+          onClick={() => setOpen(true)}
         >
           <CalendarIcon className="mr-1 h-3 w-3" />
           {date ? (
@@ -96,33 +101,58 @@ export function DateTimePicker({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className={cn(
+          "w-auto p-0",
+          isMobile && "pb-1"
+        )}
+        align={isMobile ? "center" : "start"}
+        side={isMobile ? "bottom" : undefined}
+        avoidCollisions
+        sideOffset={isMobile ? 5 : 4}
+      >
         <div className="rounded-lg border">
-          <div className="flex max-sm:flex-col">
+          <div className="flex">
             <Calendar
               mode="single"
               selected={date}
-              onSelect={onDateChange}
-              className="p-2 sm:pe-5"
+              onSelect={(newDate) => {
+                onDateChange(newDate);
+                if (!time && newDate) {
+                  const now = new Date();
+                  const hours = now.getHours();
+                  const minutes = now.getMinutes() < 30 ? 30 : 0;
+                  const nextHour = minutes === 0 ? hours + 1 : hours;
+                  const timeString = `${String(nextHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                  onTimeChange(timeString);
+                }
+              }}
+              className={cn(
+                "p-2 pe-5",
+                isMobile && "scale-[0.9] origin-left transform"
+              )}
               disabled={[{ before: today }]}
               initialFocus
             />
-            <div className="relative w-full max-sm:h-48 sm:w-40">
-              <div className="absolute inset-0 border-border py-4 max-sm:border-t">
-                <ScrollArea className="h-full border-border sm:border-s">
-                  <div className="space-y-3">
-                    <div className="flex h-5 shrink-0 items-center px-5">
+            <div className={cn(
+              "relative w-40 border-l border-border",
+              isMobile && "w-32"
+            )}>
+              <div className="absolute inset-0 py-3">
+                <ScrollArea className="h-full" type={isMobile ? "always" : "auto"}>
+                  <div className="space-y-1">
+                    <div className="flex h-5 shrink-0 items-center px-4">
                       <p className="text-sm font-medium">
                         {date ? format(date, "EEEE, d") : "Select a date"}
                       </p>
                     </div>
-                    <div className="grid gap-1.5 px-5 max-sm:grid-cols-2">
+                    <div className="grid gap-1 px-3">
                       {timeSlots.map(({ time: timeSlot, available }) => {
                         let disabled = false;
                         if (
                           date &&
                           format(date, "yyyy-MM-dd") ===
-                            format(today, "yyyy-MM-dd")
+                          format(today, "yyyy-MM-dd")
                         ) {
                           const [currentHour, currentMinute] = format(
                             today,
@@ -148,10 +178,14 @@ export function DateTimePicker({
                             size="sm"
                             className={cn(
                               "w-full",
+                              isMobile && "h-7 text-xs",
                               disabled && "opacity-50 cursor-not-allowed"
                             )}
                             onClick={() => {
                               onTimeChange(timeSlot);
+                              if (isMobile) {
+                                setTimeout(() => setOpen(false), 300);
+                              }
                             }}
                             disabled={!available || disabled}
                           >
