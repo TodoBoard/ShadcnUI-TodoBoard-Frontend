@@ -30,9 +30,9 @@ export function TermsSection() {
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">4. Limitation of Liability</h2>
         <p className="text-muted-foreground">
-          TodoBoard is provided "as is" without any warranties of any kind. We
-          are not liable for any damages arising from the use of the
-          application.
+          TodoBoard is provided &ldquo;as is&rdquo; without any warranties of
+          any kind. We are not liable for any damages arising from the use of
+          the application.
         </p>
       </div>
 

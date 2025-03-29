@@ -30,7 +30,6 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription,
   DrawerFooter,
   DrawerClose,
 } from "@/components/ui/drawer";
@@ -59,6 +58,7 @@ export function Projects() {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [username, setUsername] = useState<string>("");
   const [avatarId, setAvatarId] = useState<number | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
 
   const projectTitle = useProjectTitle();
   const projectId = useProjectId();
@@ -66,6 +66,7 @@ export function Projects() {
     loading,
     error,
     fetchTodos,
+    silentlyRefreshTodos,
     createTodo,
     updateTodo,
     deleteTodo,
@@ -84,8 +85,16 @@ export function Projects() {
     if (projectId) {
       fetchTodos(projectId);
       setSelectedProjectId(projectId);
+
+      const refreshInterval = setInterval(() => {
+        if (projectId) {
+          silentlyRefreshTodos(projectId);
+        }
+      }, 30000);
+
+      return () => clearInterval(refreshInterval);
     }
-  }, [projectId, fetchTodos, setSelectedProjectId]);
+  }, [projectId, fetchTodos, silentlyRefreshTodos, setSelectedProjectId]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -187,6 +196,7 @@ export function Projects() {
 
         await updateTodo(editingTask.id, updateData);
         setEditingTask(null);
+        setEditingTaskId(null);
       } else {
         await createTodo(todoData as TodoCreate);
       }
@@ -194,7 +204,11 @@ export function Projects() {
       resetForm();
 
       if (!editingTask) {
-        focusTitleInput();
+        if (isMobile) {
+          setIsFormVisible(false);
+        } else {
+          focusTitleInput();
+        }
       } else {
         setIsFormVisible(false);
       }
@@ -210,7 +224,7 @@ export function Projects() {
         ? format(dueDate, "HH:mm")
         : null;
 
-    setEditingTask({
+    const taskToEdit = {
       id: todo.id,
       title: todo.title,
       description: todo.description,
@@ -228,7 +242,10 @@ export function Projects() {
           ? `/user/avatar/${avatarId}.png`
           : "",
       },
-    });
+    };
+
+    setEditingTask(taskToEdit);
+    setEditingTaskId(todo.id);
 
     setFormData({
       title: todo.title,
@@ -237,13 +254,23 @@ export function Projects() {
       dueTime: dueTime,
       priority: todo.priority || undefined,
     });
-    setIsFormVisible(true);
+
+    if (isMobile) {
+      setIsFormVisible(true);
+    }
+
     setTimeout(() => titleInputRef.current?.focus(), 0);
   };
 
   const handleDeleteTask = async (todoId: string) => {
     try {
       await deleteTodo(todoId);
+
+      if (editingTask && editingTask.id === todoId) {
+        setEditingTask(null);
+        setIsFormVisible(false);
+        resetForm();
+      }
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -289,6 +316,7 @@ export function Projects() {
             setIsFormVisible(open);
             if (!open) {
               setEditingTask(null);
+              setEditingTaskId(null);
               resetForm();
             }
           }}
@@ -308,6 +336,7 @@ export function Projects() {
                   onClick={() => {
                     setIsFormVisible(false);
                     setEditingTask(null);
+                    setEditingTaskId(null);
                     resetForm();
                   }}
                 >
@@ -355,26 +384,46 @@ export function Projects() {
             title="404 Project Not Found"
             message="Invalid project URL. Please check the URL and try again."
           />
-        ) : loading ? (
-          <TaskSkeletonList />
         ) : error ? (
           <ErrorState
             title="404 Project Not Found"
             message="The project you're looking for doesn't exist or you don't have access to it."
           />
+        ) : loading ? (
+          <TaskSkeletonList />
         ) : (
           <div className="space-y-2">
             {currentProjectTodos
               .filter((todo) => todo.status !== "done")
-              .map((todo) => (
-                <TaskItem
-                  key={todo.id}
-                  task={transformTodoToTask(todo)}
-                  toggleTaskComplete={() => toggleTaskComplete(todo)}
-                  onEdit={() => handleEditTask(todo)}
-                  onDelete={() => handleDeleteTask(todo.id)}
-                />
-              ))}
+              .map((todo) => {
+                if (!isMobile && editingTaskId === todo.id) {
+                  return (
+                    <TaskForm
+                      key={todo.id}
+                      formData={formData}
+                      onSubmit={handleSubmit}
+                      onChange={setFormData}
+                      onCancel={() => {
+                        setEditingTask(null);
+                        setEditingTaskId(null);
+                        resetForm();
+                      }}
+                      currentProjectId={projectId}
+                      isEditing={true}
+                    />
+                  );
+                }
+
+                return (
+                  <TaskItem
+                    key={todo.id}
+                    task={transformTodoToTask(todo)}
+                    toggleTaskComplete={() => toggleTaskComplete(todo)}
+                    onEdit={() => handleEditTask(todo)}
+                    onDelete={() => handleDeleteTask(todo.id)}
+                  />
+                );
+              })}
 
             {renderTaskForm()}
 
@@ -408,9 +457,7 @@ export function Projects() {
 
             {!isFormVisible &&
               !editingTask &&
-              currentProjectTodos.length === 0 &&
-              !loading &&
-              !error && (
+              currentProjectTodos.length === 0 && (
                 <NoTasks
                   onAddTask={() => {
                     setIsFormVisible(true);

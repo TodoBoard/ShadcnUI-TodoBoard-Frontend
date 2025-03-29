@@ -29,7 +29,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useProjectsStore } from "@/store/projects";
 import { toast } from "sonner";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 export function NavInvitedProjects({
   projects,
@@ -57,7 +62,7 @@ export function NavInvitedProjects({
     }
   };
 
-  const handleDragEnd = async (result: any) => {
+  const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
 
     const items = Array.from(projects);
@@ -68,10 +73,8 @@ export function NavInvitedProjects({
       item.id.split("-").slice(-5).join("-")
     );
 
-    // Update UI immediately with type 'invited'
     updateLocalProjectSorting(projectIds, "invited");
 
-    // Then sync with backend
     await updateProjectSorting(projectIds);
   };
 

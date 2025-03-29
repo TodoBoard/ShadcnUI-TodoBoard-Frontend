@@ -25,7 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 import { submitForm } from "@/lib/api";
-import { Form as FormModel } from "@/models/form";
+import Image from "next/image";
 
 const formSchema = z.object({
   title: z.string().min(1).max(255),
@@ -103,7 +103,14 @@ export const ContactSection = () => {
               </span>
             </h2>
           </div>
-          <img src="/home/contact_us.png" alt="Contact Us" className="mt-4" />
+          <Image
+            src="/home/contact_us.png"
+            alt="Contact Us"
+            width={500}
+            height={300}
+            className="mt-4"
+            priority
+          />
         </div>
 
         <Card>

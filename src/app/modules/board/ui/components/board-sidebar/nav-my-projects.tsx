@@ -37,7 +37,12 @@ import { RenameProjectDialog } from "../board-dialog/rename-project-dialog";
 import { DeleteProjectDialog } from "../board-dialog/delete-project-dialog";
 import { ManageTeamDialog } from "../board-dialog/manage-team-dialog";
 import { useProjectsStore } from "@/store/projects";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 export function NavMyProjects({
   projects,
@@ -67,7 +72,7 @@ export function NavMyProjects({
   >(null);
   const [openManageTeamDialog, setOpenManageTeamDialog] = useState(false);
 
-  const handleDragEnd = async (result: any) => {
+  const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
 
     const items = Array.from(projects);
@@ -78,10 +83,8 @@ export function NavMyProjects({
       item.id.split("-").slice(-5).join("-")
     );
 
-    // Update UI immediately with type 'my'
     updateLocalProjectSorting(projectIds, "my");
 
-    // Then sync with backend
     await updateProjectSorting(projectIds);
   };
 
