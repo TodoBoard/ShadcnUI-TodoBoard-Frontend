@@ -141,8 +141,8 @@ export function Projects() {
         avatar: todo.avatar_id
           ? `/user/avatar/${todo.avatar_id}.png`
           : avatarId
-          ? `/user/avatar/${avatarId}.png`
-          : "",
+            ? `/user/avatar/${avatarId}.png`
+            : "",
       },
     };
   };
@@ -197,20 +197,19 @@ export function Projects() {
         await updateTodo(editingTask.id, updateData);
         setEditingTask(null);
         setEditingTaskId(null);
+        setIsFormVisible(false);
       } else {
         await createTodo(todoData as TodoCreate);
+
+        if (isMobile) {
+          setIsFormVisible(false);
+        }
       }
 
       resetForm();
 
-      if (!editingTask) {
-        if (isMobile) {
-          setIsFormVisible(false);
-        } else {
-          focusTitleInput();
-        }
-      } else {
-        setIsFormVisible(false);
+      if (!isMobile && isFormVisible) {
+        focusTitleInput();
       }
     } catch (error) {
       console.error("Error submitting task:", error);
@@ -239,8 +238,8 @@ export function Projects() {
         avatar: todo.avatar_id
           ? `/user/avatar/${todo.avatar_id}.png`
           : avatarId
-          ? `/user/avatar/${avatarId}.png`
-          : "",
+            ? `/user/avatar/${avatarId}.png`
+            : "",
       },
     };
 
@@ -257,6 +256,8 @@ export function Projects() {
 
     if (isMobile) {
       setIsFormVisible(true);
+    } else {
+      setIsFormVisible(false);
     }
 
     setTimeout(() => titleInputRef.current?.focus(), 0);
@@ -290,6 +291,8 @@ export function Projects() {
   };
 
   const handleAddTaskClick = () => {
+    setEditingTask(null);
+    setEditingTaskId(null);
     setIsFormVisible(true);
     setTimeout(() => titleInputRef.current?.focus(), 0);
   };
@@ -308,7 +311,7 @@ export function Projects() {
   );
 
   const renderTaskForm = () => {
-    if (isMobile) {
+    if (isMobile && isFormVisible) {
       return (
         <Drawer
           open={isFormVisible}
@@ -334,10 +337,10 @@ export function Projects() {
                   variant="outline"
                   className="rounded-xl"
                   onClick={() => {
-                    setIsFormVisible(false);
+                    resetForm();
                     setEditingTask(null);
                     setEditingTaskId(null);
-                    resetForm();
+                    setIsFormVisible(false);
                   }}
                 >
                   Cancel
@@ -349,7 +352,7 @@ export function Projects() {
       );
     }
 
-    return isFormVisible && taskFormContent;
+    return (!isMobile && isFormVisible && !editingTaskId) ? taskFormContent : null;
   };
 
   return (
