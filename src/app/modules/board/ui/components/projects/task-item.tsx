@@ -37,7 +37,7 @@ export function TaskItem({
 }: TaskItemProps) {
   return (
     <div>
-      <div className="flex items-center gap-3 py-1.5">
+      <div className="flex flex-wrap items-center gap-3 py-1.5 w-full overflow-hidden">
         <button
           onClick={() => toggleTaskComplete(task.id)}
           className={cn(
@@ -67,13 +67,13 @@ export function TaskItem({
         <div className="flex-1 flex items-center gap-3 min-w-0">
           <span
             className={cn(
-              "text-sm flex-1 truncate",
+              "text-sm flex-1 break-words md:truncate",
               task.completed && "line-through text-gray-400"
             )}
           >
             {task.title}
           </span>
-          <div className="flex items-center gap-2 text-xs text-gray-500 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
             {task.priority && (
               <div className="flex items-center gap-1">
                 <div
@@ -115,7 +115,7 @@ export function TaskItem({
           </div>
         </div>
       </div>
-      <div className="ml-7 space-y-1">
+      <div className="pl-7 space-y-1">
         {task.description && (
           <p className="text-xs text-gray-500 break-words">
             {task.description}
