@@ -12,7 +12,7 @@ export const BoardLayout = ({ children }: BoardLayoutProps) => {
       <AppSidebar />
       <SidebarInset>
         <BoardNavbar />
-        <div className="flex-1 overflow-auto container">{children}</div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden container">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

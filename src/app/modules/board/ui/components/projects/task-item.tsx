@@ -67,7 +67,7 @@ export function TaskItem({
         <div className="flex-1 flex items-center gap-3 min-w-0">
           <span
             className={cn(
-              "text-sm flex-1 break-words md:truncate",
+              "text-sm flex-1 break-words",
               task.completed && "line-through text-gray-400"
             )}
           >

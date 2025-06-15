@@ -591,6 +591,25 @@ const SidebarMenuAction = React.forwardRef<
 >(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button";
 
+  // Detect if the current device actually supports hover interactions. On iPadOS
+  // (the environment that triggered the double-tap bug), `(hover: hover)` returns
+  // false, so we fall back to always-visible actions and avoid Safari's first-tap
+  // “preview” behaviour.
+  const [canHover, setCanHover] = React.useState<boolean>(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(hover: hover)").matches
+      : false
+  );
+
+  React.useEffect(() => {
+    const mql = window.matchMedia("(hover: hover)");
+    const handler = (e: MediaQueryListEvent) => setCanHover(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+
+  const shouldHideUntilHover = showOnHover && canHover;
+
   return (
     <Comp
       ref={ref}
@@ -602,7 +621,7 @@ const SidebarMenuAction = React.forwardRef<
         "peer-data-[size=default]/menu-button:top-1.5",
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
-        showOnHover &&
+        shouldHideUntilHover &&
           "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
         className
       )}
