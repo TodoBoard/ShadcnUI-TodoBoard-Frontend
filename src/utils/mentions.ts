@@ -4,14 +4,12 @@ export interface MentionResult {
 }
 
 export function parseMention(title: string): MentionResult {
-  const match = title.match(/^@(\w+)\s+(.*)$/);
-  if (match) {
-    return {
-      username: match[1],
-      cleanTitle: match[2],
-    };
-  }
-  return { cleanTitle: title };
+  const match = title.match(/@(\w+)/);
+  const username = match ? match[1] : undefined;
+  return {
+    username,
+    cleanTitle: sanitizeTitle(title),
+  };
 }
 
 export function sanitizeTitle(title: string): string {
