@@ -327,18 +327,25 @@ export const Invites = {
 };
 
 export const Todos = {
-  getAllTodos: async (): Promise<TodoListResponse> => {
+  getAllTodos: async (assignedOnly: boolean = false): Promise<TodoListResponse> => {
     try {
-      const response = await api.get<TodoListResponse>("/todos");
+      const response = await api.get<TodoListResponse>("/todos", {
+        params: assignedOnly ? { assigned_only: true } : undefined,
+      });
       return response.data;
     } catch (error) {
       throw handleApiError(error);
     }
   },
 
-  getProjectTodos: async (projectId: string): Promise<TodoListResponse> => {
+  getProjectTodos: async (
+    projectId: string,
+    assignedOnly: boolean = false
+  ): Promise<TodoListResponse> => {
     try {
-      const response = await api.get<TodoListResponse>(`/todos/${projectId}`);
+      const response = await api.get<TodoListResponse>(`/todos/${projectId}`, {
+        params: assignedOnly ? { assigned_only: true } : undefined,
+      });
       return response.data;
     } catch (error) {
       throw handleApiError(error);

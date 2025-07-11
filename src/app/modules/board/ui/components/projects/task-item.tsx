@@ -18,6 +18,10 @@ export interface Task {
     name: string;
     avatar: string;
   };
+  assignee?: {
+    name: string;
+    avatar: string;
+  };
 }
 
 interface TaskItemProps {
@@ -96,6 +100,18 @@ export function TaskItem({
                     format(parseISO(task.due_date), "HH:mm") !== "00:00" &&
                     `, ${format(parseISO(task.due_date), "HH:mm")}`}
                 </span>
+              </div>
+            )}
+            {task.assignee && (
+              <div className="flex items-center gap-1">
+                <Image
+                  src={task.assignee.avatar || "/placeholder.png"}
+                  alt={task.assignee.name}
+                  width={16}
+                  height={16}
+                  className="rounded-full"
+                />
+                <span>@{task.assignee.name}</span>
               </div>
             )}
             {!disableEdit && onEdit && (

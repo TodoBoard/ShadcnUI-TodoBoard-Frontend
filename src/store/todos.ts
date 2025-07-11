@@ -11,12 +11,12 @@ interface TodosStore {
   errorMessage?: string;
   selectedProjectId: string | undefined;
   setSelectedProjectId: (id: string) => void;
-  fetchTodos: (projectId: string) => Promise<void>;
+  fetchTodos: (projectId: string, assignedOnly?: boolean) => Promise<void>;
   createTodo: (todo: TodoCreate) => Promise<void>;
   updateTodo: (todoId: string, todo: TodoUpdateSchema) => Promise<void>;
   deleteTodo: (todoId: string) => Promise<void>;
   getProjectTodos: (projectId: string) => Todo[];
-  fetchAllTodos: () => Promise<void>;
+  fetchAllTodos: (assignedOnly?: boolean) => Promise<void>;
   silentlyRefreshTodos: (projectId: string) => Promise<void>;
 }
 
@@ -28,10 +28,10 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
   selectedProjectId: undefined,
   setSelectedProjectId: (id: string) => set({ selectedProjectId: id }),
 
-  fetchTodos: async (projectId: string) => {
+  fetchTodos: async (projectId: string, assignedOnly: boolean = false) => {
     set({ loading: true, error: null, errorMessage: undefined });
     try {
-      const response = await Todos.getProjectTodos(projectId);
+      const response = await Todos.getProjectTodos(projectId, assignedOnly);
       set({
         todos: response.todos,
         loading: false,
@@ -91,10 +91,10 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
     }
   },
 
-  fetchAllTodos: async () => {
+  fetchAllTodos: async (assignedOnly: boolean = false) => {
     set({ loading: true, error: null, errorMessage: undefined });
     try {
-      const response = await Todos.getAllTodos();
+      const response = await Todos.getAllTodos(assignedOnly);
       set({
         todos: response.todos,
         loading: false,

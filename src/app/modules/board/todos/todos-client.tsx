@@ -10,23 +10,25 @@ import { CompletedTasks } from "@/app/modules/board/ui/components/projects/compl
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ErrorState } from "@/app/modules/board/ui/components/error-state/error-state";
 import { NoTodos } from "@/app/modules/board/ui/components/todos/no-todos";
+import { Switch } from "@/components/ui/switch";
 
 export function Todos() {
   const [username, setUsername] = useState<string>("");
   const [avatarId, setAvatarId] = useState<number | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [assignedOnly, setAssignedOnly] = useState(false);
   const { todos, loading, error, fetchAllTodos, updateTodo, deleteTodo } =
     useTodosStore();
   const playTaskCompleteSound = useTaskCompleteSound();
 
   useEffect(() => {
-    fetchAllTodos();
+    fetchAllTodos(assignedOnly);
 
     const storedUsername = localStorage.getItem("username");
     const storedAvatarId = localStorage.getItem("avatar_id");
     if (storedUsername) setUsername(storedUsername);
     if (storedAvatarId) setAvatarId(parseInt(storedAvatarId));
-  }, [fetchAllTodos]);
+  }, [fetchAllTodos, assignedOnly]);
 
   const transformTodoToTask = (todo: Todo) => {
     const dueDate = todo.due_date ? new Date(todo.due_date) : undefined;
@@ -45,6 +47,14 @@ export function Todos() {
         name: isCurrentUser ? "You" : todo.username,
         avatar: todo.avatar_id ? `/user/avatar/${todo.avatar_id}.png` : "",
       },
+      assignee: todo.assignee_username
+        ? {
+            name: todo.assignee_username,
+            avatar: todo.assignee_avatar_id
+              ? `/user/avatar/${todo.assignee_avatar_id}.png`
+              : "",
+          }
+        : undefined,
     };
   };
 
@@ -75,6 +85,14 @@ export function Todos() {
     <div className="space-y-6 pb-4 pt-2">
       <div className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">Todos</h1>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Assigned only</span>
+            <Switch
+              checked={assignedOnly}
+              onCheckedChange={(val) => setAssignedOnly(val)}
+            />
+          </div>
         <Avatar className="ring-2 ring-background w-8 h-8">
           <AvatarImage
             src={avatarId ? `/user/avatar/${avatarId}.png` : undefined}
@@ -84,6 +102,7 @@ export function Todos() {
             {username ? username.slice(0, 2).toUpperCase() : "U"}
           </AvatarFallback>
         </Avatar>
+        </div>
       </div>
 
       <div className="space-y-2">

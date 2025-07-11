@@ -10,6 +10,8 @@ import { useProjectId } from "@/hooks/use-project-id";
 import { useTodosStore } from "@/store/todos";
 import { Todo, TodoCreate, TodoUpdateSchema } from "@/models/todos";
 import { useProjectsStore } from "@/store/projects";
+import { TeamMember } from "@/models/projects";
+import { parseMention, composeTitle } from "@/utils/mentions";
 import {
   TaskItem,
   Task,
@@ -41,6 +43,7 @@ interface TaskFormData {
   dueDate: Date | undefined;
   dueTime: string | null;
   priority: string | undefined;
+  assignedUserId?: string | null;
 }
 
 export function Projects() {
@@ -51,6 +54,7 @@ export function Projects() {
     dueDate: undefined,
     dueTime: null,
     priority: undefined,
+    assignedUserId: undefined,
   });
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
@@ -113,6 +117,7 @@ export function Projects() {
     dueDate: undefined,
     dueTime: null,
     priority: undefined,
+    assignedUserId: undefined,
   };
 
   const resetForm = () => {
@@ -144,7 +149,38 @@ export function Projects() {
             ? `/user/avatar/${avatarId}.png`
             : "",
       },
+      assignee: todo.assignee_username
+        ? {
+            name: todo.assignee_username,
+            avatar: todo.assignee_avatar_id
+              ? `/user/avatar/${todo.assignee_avatar_id}.png`
+              : "",
+          }
+        : undefined,
     };
+  };
+
+  const processTaskData = (
+    title: string,
+    assignedUserId: string | null | undefined,
+    teamMembers: TeamMember[]
+  ) => {
+    const { cleanTitle, username: mentionedUsername } = parseMention(title);
+
+    if (assignedUserId === null) {
+      return { cleanTitle, finalAssignedUserId: null };
+    }
+
+    if (assignedUserId) {
+      return { cleanTitle, finalAssignedUserId: assignedUserId };
+    }
+
+    if (mentionedUsername) {
+      const user = teamMembers.find((m) => m.username === mentionedUsername);
+      return { cleanTitle, finalAssignedUserId: user?.id };
+    }
+
+    return { cleanTitle, finalAssignedUserId: null };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -153,33 +189,16 @@ export function Projects() {
     if (!formData.title.trim() || !projectId) return;
 
     try {
-      const todoData: Partial<TodoCreate> = {
-        title: formData.title.trim(),
-        project_id: selectedProjectId || projectId,
-      };
-
-      if (formData.description?.trim()) {
-        todoData.description = formData.description.trim();
-      }
-
-      if (formData.priority) {
-        todoData.priority = formData.priority;
-      }
-
-      if (formData.dueDate) {
-        const date = new Date(formData.dueDate);
-        if (formData.dueTime) {
-          const [hours, minutes] = formData.dueTime.split(":");
-          date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-        } else {
-          date.setHours(0, 0, 0, 0);
-        }
-        todoData.due_date = date.toISOString();
-      }
-
+      const { cleanTitle, finalAssignedUserId } = processTaskData(
+        formData.title,
+        formData.assignedUserId,
+        teamMembers
+      );
+      
       if (editingTask) {
         const updateData: Partial<TodoUpdateSchema> = {
-          title: formData.title.trim(),
+          title: cleanTitle,
+          assigned_user_id: finalAssignedUserId,
         };
 
         if (formData.description?.trim()) {
@@ -199,6 +218,31 @@ export function Projects() {
         setEditingTaskId(null);
         setIsFormVisible(false);
       } else {
+        const todoData: Partial<TodoCreate> = {
+          title: cleanTitle,
+          project_id: selectedProjectId || projectId,
+          assigned_user_id: finalAssignedUserId,
+        };
+
+        if (formData.description?.trim()) {
+          todoData.description = formData.description.trim();
+        }
+
+        if (formData.priority) {
+          todoData.priority = formData.priority;
+        }
+
+        if (formData.dueDate) {
+          const date = new Date(formData.dueDate);
+          if (formData.dueTime) {
+            const [hours, minutes] = formData.dueTime.split(":");
+            date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+          } else {
+            date.setHours(0, 0, 0, 0);
+          }
+          todoData.due_date = date.toISOString();
+        }
+
         await createTodo(todoData as TodoCreate);
 
         if (isMobile) {
@@ -222,6 +266,8 @@ export function Projects() {
       dueDate && format(dueDate, "HH:mm") !== "00:00"
         ? format(dueDate, "HH:mm")
         : null;
+    
+    const taskTitle = composeTitle(todo.assignee_username, todo.title);
 
     const taskToEdit = {
       id: todo.id,
@@ -241,17 +287,26 @@ export function Projects() {
             ? `/user/avatar/${avatarId}.png`
             : "",
       },
+      assignee: todo.assignee_username
+        ? {
+            name: todo.assignee_username,
+            avatar: todo.assignee_avatar_id
+              ? `/user/avatar/${todo.assignee_avatar_id}.png`
+              : "",
+          }
+        : undefined,
     };
 
     setEditingTask(taskToEdit);
     setEditingTaskId(todo.id);
 
     setFormData({
-      title: todo.title,
+      title: taskTitle,
       description: todo.description,
       dueDate: dueDate,
       dueTime: dueTime,
       priority: todo.priority || undefined,
+      assignedUserId: todo.assigned_user_id || undefined,
     });
 
     if (isMobile) {
@@ -307,6 +362,7 @@ export function Projects() {
         resetForm();
       }}
       currentProjectId={projectId}
+      teamMembers={teamMembers}
     />
   );
 
@@ -412,6 +468,7 @@ export function Projects() {
                         resetForm();
                       }}
                       currentProjectId={projectId}
+                      teamMembers={teamMembers}
                       isEditing={true}
                     />
                   );
