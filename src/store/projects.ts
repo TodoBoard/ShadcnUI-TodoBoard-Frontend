@@ -25,6 +25,10 @@ interface ProjectsStore {
     projectIds: string[],
     type: "my" | "invited"
   ) => void;
+  upsertProject: (project: Project, type: "my" | "invited") => void;
+  removeProject: (id: string) => void;
+  addMember: (projectId: string, member: { id: string; username: string; avatar_id: number }) => void;
+  removeMember: (projectId: string, userId: string) => void;
 }
 
 export const useProjectsStore = create<ProjectsStore>((set, get) => ({
@@ -120,5 +124,51 @@ export const useProjectsStore = create<ProjectsStore>((set, get) => ({
         ? { myProjects: sortedProjects }
         : { invitedProjects: sortedProjects }
     );
+  },
+  removeProject: (id: string) => {
+    set((state) => ({
+      myProjects: state.myProjects.filter((p) => p.id !== id),
+      invitedProjects: state.invitedProjects.filter((p) => p.id !== id),
+    }));
+  },
+  upsertProject: (project: Project, type: "my" | "invited") => {
+    set((state) => {
+      const list = type === "my" ? state.myProjects : state.invitedProjects;
+      const index = list.findIndex((p) => p.id === project.id);
+      if (index !== -1) {
+        const newList = [...list];
+        newList[index] = { ...newList[index], ...project };
+        return type === "my" ? { myProjects: newList } : { invitedProjects: newList };
+      }
+      return type === "my"
+        ? { myProjects: [...list, project] }
+        : { invitedProjects: [...list, project] };
+    });
+  },
+  addMember: (projectId, member) => {
+    set((state) => {
+      const updateList = (projects: Project[]) =>
+        projects.map((p) =>
+          p.id === projectId ? { ...p, team_members: [...p.team_members, member] } : p
+        );
+      return {
+        myProjects: updateList(state.myProjects),
+        invitedProjects: updateList(state.invitedProjects),
+      };
+    });
+  },
+  removeMember: (projectId, userId) => {
+    set((state) => {
+      const updateList = (projects: Project[]) =>
+        projects.map((p) =>
+          p.id === projectId
+            ? { ...p, team_members: p.team_members.filter((m) => m.id !== userId) }
+            : p
+        );
+      return {
+        myProjects: updateList(state.myProjects),
+        invitedProjects: updateList(state.invitedProjects),
+      };
+    });
   },
 }));

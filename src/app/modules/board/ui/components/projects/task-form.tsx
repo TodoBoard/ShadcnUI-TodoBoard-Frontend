@@ -59,6 +59,7 @@ export function TaskForm({
   const titleInputRef = useRef<HTMLInputElement>(null)
   const [showMentions, setShowMentions] = useState(false)
   const [filteredMembers, setFilteredMembers] = useState<TeamMember[]>([])
+  const [selectedMemberIndex, setSelectedMemberIndex] = useState(0)
 
   const { myProjects, invitedProjects } = useProjectsStore();
   const { selectedProjectId, setSelectedProjectId } = useTodosStore();
@@ -83,6 +84,7 @@ export function TaskForm({
     
     if (mentionMatch) {
       setShowMentions(true)
+      setSelectedMemberIndex(0)
       const query = mentionMatch[1]
       setFilteredMembers(
         teamMembers.filter((m) =>
@@ -134,6 +136,25 @@ export function TaskForm({
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (showMentions && filteredMembers.length > 0) {
+      if (e.key === 'Tab' || e.key === 'Enter') {
+        e.preventDefault()
+        handleMentionSelect(filteredMembers[selectedMemberIndex])
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedMemberIndex(prev => 
+          prev < filteredMembers.length - 1 ? prev + 1 : prev
+        )
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedMemberIndex(prev => prev > 0 ? prev - 1 : 0)
+      } else if (e.key === 'Escape') {
+        setShowMentions(false)
+      }
+    }
+  }
+
   const updateTitleMention = (value: string, title: string): string => {
     const cleaned = sanitizeTitle(title);
     if (value === "unassigned") return cleaned;
@@ -164,6 +185,7 @@ export function TaskForm({
               placeholder="Task name"
               value={formData.title}
               onChange={handleTitleChange}
+              onKeyDown={handleKeyDown}
               onBlur={() => setTimeout(() => setShowMentions(false), 200)}
               className="w-full text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground focus:outline-none overflow-ellipsis"
               required
@@ -172,11 +194,14 @@ export function TaskForm({
               <div className="absolute top-full left-0 mt-1 w-full rounded-md border bg-card text-card-foreground shadow-lg z-10">
                 {filteredMembers.length > 0 ? (
                   <ul>
-                    {filteredMembers.map((member) => (
+                    {filteredMembers.map((member, index) => (
                       <li
                         key={member.id}
                         onMouseDown={() => handleMentionSelect(member)}
-                        className="p-2 text-sm hover:bg-muted cursor-pointer"
+                        className={`p-2 text-sm cursor-pointer ${
+                          index === selectedMemberIndex ? 'bg-muted' : 'hover:bg-muted'
+                        }`}
+                        onMouseEnter={() => setSelectedMemberIndex(index)}
                       >
                         {member.username}
                       </li>

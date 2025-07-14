@@ -36,6 +36,7 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { useSidebarMobileClose } from "@/hooks/use-sidebar-mobile-close";
+import { useRouter } from "next/navigation";
 
 export function NavInvitedProjects({
   projects,
@@ -51,6 +52,7 @@ export function NavInvitedProjects({
   const handleMobileItemClick = useSidebarMobileClose();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { leaveProject, updateProjectSorting, updateLocalProjectSorting } =
     useProjectsStore();
 
@@ -59,6 +61,9 @@ export function NavInvitedProjects({
     try {
       await leaveProject(id);
       toast.success(`Left project ${projectName} successfully`);
+      if (pathname.includes(id)) {
+        router.push("/board/home");
+      }
     } catch {
       toast.error("Failed to leave project");
     }

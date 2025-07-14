@@ -70,7 +70,6 @@ export function Projects() {
     loading,
     error,
     fetchTodos,
-    silentlyRefreshTodos,
     createTodo,
     updateTodo,
     deleteTodo,
@@ -86,19 +85,10 @@ export function Projects() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (projectId) {
-      fetchTodos(projectId);
-      setSelectedProjectId(projectId);
-
-      const refreshInterval = setInterval(() => {
-        if (projectId) {
-          silentlyRefreshTodos(projectId);
-        }
-      }, 30000);
-
-      return () => clearInterval(refreshInterval);
-    }
-  }, [projectId, fetchTodos, silentlyRefreshTodos, setSelectedProjectId]);
+    if (!projectId) return;
+    fetchTodos(projectId);
+    setSelectedProjectId(projectId);
+  }, [projectId, fetchTodos, setSelectedProjectId]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");

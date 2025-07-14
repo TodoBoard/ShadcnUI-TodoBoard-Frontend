@@ -18,6 +18,8 @@ interface TodosStore {
   getProjectTodos: (projectId: string) => Todo[];
   fetchAllTodos: (assignedOnly?: boolean) => Promise<void>;
   silentlyRefreshTodos: (projectId: string) => Promise<void>;
+  upsertTodo: (todo: Todo) => void;
+  removeTodo: (id: string) => void;
 }
 
 export const useTodosStore = create<TodosStore>((set, get) => ({
@@ -50,12 +52,7 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
   createTodo: async (todo: TodoCreate) => {
     try {
       const newTodo = await Todos.createTodo(todo);
-      set((state) => ({
-        todos:
-          newTodo.project_id === get().selectedProjectId
-            ? [...state.todos, newTodo]
-            : state.todos,
-      }));
+      get().upsertTodo(newTodo);
     } catch (error) {
       const errorMessage =
         typeof error === "string" ? error : "Failed to create todo";
@@ -126,6 +123,20 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
         typeof error === "string" ? error : "Failed to fetch todos";
       set({ error: "OTHER", errorMessage, loading: false });
     }
+  },
+  removeTodo: (id: string) => {
+    set((state) => ({ todos: state.todos.filter((t) => t.id !== id) }));
+  },
+  upsertTodo: (todo: Todo) => {
+    set((state) => {
+      const index = state.todos.findIndex((t) => t.id === todo.id);
+      if (index !== -1) {
+        const newTodos = [...state.todos];
+        newTodos[index] = { ...newTodos[index], ...todo };
+        return { todos: newTodos };
+      }
+      return { todos: [...state.todos, todo] };
+    });
   },
 }));
 
