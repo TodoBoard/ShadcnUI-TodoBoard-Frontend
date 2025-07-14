@@ -20,10 +20,6 @@ export function RealtimeProvider({ children }: Props) {
   const manualDisconnectRef = useRef<boolean>(false);
   const RECONNECT_BASE_DELAY = 1000;
   const RECONNECT_MAX_DELAY = 30000;
-  const pingIntervalRef = useRef<number | null>(null);
-  const pongTimeoutRef = useRef<number | null>(null);
-  const HEARTBEAT_INTERVAL = 30000; // 30s
-  const PONG_TIMEOUT = 5000; // 5s
   const router = useRouter();
   const pathname = usePathname();
 
@@ -52,26 +48,11 @@ export function RealtimeProvider({ children }: Props) {
         todosStore.fetchAllTodos();
       }
       useProjectsStore.getState().fetchProjects();
-      if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
-      pingIntervalRef.current = window.setInterval(() => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({ event: 'ping' }));
-          if (pongTimeoutRef.current) clearTimeout(pongTimeoutRef.current);
-          pongTimeoutRef.current = window.setTimeout(() => {
-            console.warn('No pong received, closing socket to reconnect');
-            wsRef.current?.close();
-          }, PONG_TIMEOUT);
-        }
-      }, HEARTBEAT_INTERVAL);
     };
 
     ws.onmessage = (evt) => {
       try {
         const data = JSON.parse(evt.data);
-        if (data.event === 'pong') {
-          if (pongTimeoutRef.current) { clearTimeout(pongTimeoutRef.current); pongTimeoutRef.current = null; }
-          return;
-        }
         handleMessage(data);
       } catch {
         console.warn('Invalid WebSocket message:', evt.data);
@@ -80,8 +61,6 @@ export function RealtimeProvider({ children }: Props) {
 
     ws.onclose = () => {
       console.warn("WebSocket closed. Scheduling reconnect...");
-      if (pingIntervalRef.current) { clearInterval(pingIntervalRef.current); pingIntervalRef.current = null; }
-      if (pongTimeoutRef.current) { clearTimeout(pongTimeoutRef.current); pongTimeoutRef.current = null; }
       wsRef.current = null;
       scheduleReconnect();
     };
