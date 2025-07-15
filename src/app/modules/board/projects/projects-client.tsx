@@ -126,7 +126,7 @@ export function Projects() {
       title: todo.title,
       description: todo.description,
       status: todo.status,
-      priority: todo.priority,
+      priority: todo.priority ?? undefined,
       due_date: todo.due_date,
       dueDate: dueDate,
       dueTime: null,
@@ -195,9 +195,7 @@ export function Projects() {
           updateData.description = formData.description.trim();
         }
 
-        if (formData.priority) {
-          updateData.priority = formData.priority;
-        }
+        updateData.priority = formData.priority ?? null;
 
         if (formData.dueDate) {
           updateData.due_date = formData.dueDate.toISOString();
@@ -218,9 +216,7 @@ export function Projects() {
           todoData.description = formData.description.trim();
         }
 
-        if (formData.priority) {
-          todoData.priority = formData.priority;
-        }
+        todoData.priority = formData.priority ?? null;
 
         if (formData.dueDate) {
           const date = new Date(formData.dueDate);

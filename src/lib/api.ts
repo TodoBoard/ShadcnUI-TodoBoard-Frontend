@@ -266,6 +266,18 @@ export const Notifications = {
       throw handleApiError(error);
     }
   },
+
+  /** Mark all notifications as read */
+  markAllAsRead: async (): Promise<MarkAsReadResponse> => {
+    try {
+      const response = await api.post<MarkAsReadResponse>(
+        "/notifications/read-all"
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
 };
 
 export const Security = {

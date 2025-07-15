@@ -101,7 +101,14 @@ export function RealtimeProvider({ children }: Props) {
         break;
       }
       case "notification.new": {
-        useNotificationsStore.getState().increment();
+        const notification = data.notification;
+        if (notification) {
+          useNotificationsStore.getState().addNotification(notification);
+        }
+        break;
+      }
+      case "notification.read_all": {
+        useNotificationsStore.getState().markAllRead();
         break;
       }
       case "project.created":

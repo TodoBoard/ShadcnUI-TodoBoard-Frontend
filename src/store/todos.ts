@@ -2,6 +2,42 @@ import { create } from "zustand";
 import { Todo, TodoCreate, TodoUpdateSchema } from "@/models/todos";
 import { Todos } from "@/lib/api";
 
+// Helper to keep todos sorted exactly like the backend (priority, assigned, due_date asc, updated_at desc)
+const priorityRank: Record<string, number> = {
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
+function compareTodos(a: Todo, b: Todo): number {
+  // 1) Priority (high -> medium -> low -> none)
+  const rankA = priorityRank[a.priority?.toLowerCase() as string] ?? 4;
+  const rankB = priorityRank[b.priority?.toLowerCase() as string] ?? 4;
+  if (rankA !== rankB) return rankA - rankB;
+
+  // 2) Assigned comes first
+  const assignedA = a.assigned_user_id ? 0 : 1;
+  const assignedB = b.assigned_user_id ? 0 : 1;
+  if (assignedA !== assignedB) return assignedA - assignedB;
+
+  // 3) Due date ascending, nulls last
+  if (a.due_date && b.due_date) {
+    const diff = new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+    if (diff !== 0) return diff;
+  } else if (a.due_date && !b.due_date) {
+    return -1;
+  } else if (!a.due_date && b.due_date) {
+    return 1;
+  }
+
+  // 4) Updated_at descending (more recent first)
+  return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+}
+
+function sortTodos(todos: Todo[]): Todo[] {
+  return [...todos].sort(compareTodos);
+}
+
 type ErrorType = "NOT_FOUND" | "OTHER" | null;
 
 interface TodosStore {
@@ -35,7 +71,7 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
     try {
       const response = await Todos.getProjectTodos(projectId, assignedOnly);
       set({
-        todos: response.todos,
+        todos: sortTodos(response.todos),
         loading: false,
       });
     } catch (error) {
@@ -63,11 +99,12 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
   updateTodo: async (todoId: string, todo: TodoUpdateSchema) => {
     try {
       const updatedTodo = await Todos.updateTodo(todoId, todo);
-      set((state) => ({
-        todos: state.todos.map((t) =>
+      set((state) => {
+        const newTodos = state.todos.map((t) =>
           t.id === todoId ? { ...t, ...updatedTodo } : t
-        ),
-      }));
+        );
+        return { todos: sortTodos(newTodos) };
+      });
     } catch (error) {
       const errorMessage =
         typeof error === "string" ? error : "Failed to update todo";
@@ -93,7 +130,7 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
     try {
       const response = await Todos.getAllTodos(assignedOnly);
       set({
-        todos: response.todos,
+        todos: sortTodos(response.todos),
         loading: false,
       });
     } catch (error) {
@@ -107,16 +144,18 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
     try {
       const response = await Todos.getProjectTodos(projectId);
       set((state) => ({
-        todos: state.todos
-          .map((todo) => {
-            const updated = response.todos.find((t) => t.id === todo.id);
-            return updated || todo;
-          })
-          .concat(
-            response.todos.filter(
-              (newTodo) => !state.todos.some((t) => t.id === newTodo.id)
+        todos: sortTodos(
+          state.todos
+            .map((todo) => {
+              const updated = response.todos.find((t) => t.id === todo.id);
+              return updated || todo;
+            })
+            .concat(
+              response.todos.filter(
+                (newTodo) => !state.todos.some((t) => t.id === newTodo.id)
+              )
             )
-          ),
+        ),
       }));
     } catch (error) {
       const errorMessage =
@@ -130,12 +169,14 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
   upsertTodo: (todo: Todo) => {
     set((state) => {
       const index = state.todos.findIndex((t) => t.id === todo.id);
+      let newTodos: Todo[];
       if (index !== -1) {
-        const newTodos = [...state.todos];
+        newTodos = [...state.todos];
         newTodos[index] = { ...newTodos[index], ...todo };
-        return { todos: newTodos };
+      } else {
+        newTodos = [...state.todos, todo];
       }
-      return { todos: [...state.todos, todo] };
+      return { todos: sortTodos(newTodos) };
     });
   },
 }));

@@ -16,7 +16,12 @@ interface PrioritySelectProps {
 
 export function PrioritySelect({ value, onValueChange }: PrioritySelectProps) {
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select
+      value={value}
+      onValueChange={(val) =>
+        onValueChange(!val || val === "none" ? undefined : val)
+      }
+    >
       <SelectTrigger className="h-7 w-[100px] text-xs shadow-none">
         <SelectValue placeholder="No priority">
           {value && (
@@ -35,6 +40,7 @@ export function PrioritySelect({ value, onValueChange }: PrioritySelectProps) {
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
+        <SelectItem value="none">No priority</SelectItem>
         <SelectItem value="low" className="flex items-center">
           <div className="flex items-center">
             <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />

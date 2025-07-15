@@ -3,7 +3,7 @@ export interface Todo {
   title: string;
   description: string;
   status: string;
-  priority: string;
+  priority: string | null;
   due_date: string | null;
   created_at: string;
   updated_at: string;
@@ -23,7 +23,7 @@ export interface TodoListResponse {
 export interface TodoCreate {
   title: string;
   description: string;
-  priority: string;
+  priority?: string | null;
   due_date?: string;
   project_id: string;
   assigned_user_id?: string | null;
@@ -33,7 +33,7 @@ export interface TodoUpdateSchema {
   title?: string;
   description?: string;
   status?: string;
-  priority?: string;
+  priority?: string | null;
   due_date?: string;
   assigned_user_id?: string | null;
 }

@@ -68,8 +68,8 @@ const shareOptions = [
 ];
 
 interface InviteLinkSettings {
-  duration: string;
-  maxUses: number;
+  duration: string; // e.g., '1d', 'never'
+  maxUses: number; // 0 means unlimited
 }
 
 const defaultSettings: InviteLinkSettings = {
@@ -83,6 +83,7 @@ const expirationOptions = [
   { value: "7d", label: "7 days" },
   { value: "30d", label: "30 days" },
   { value: "100d", label: "100 days" },
+  { value: "never", label: "Never" },
 ];
 
 const usageOptions = [
@@ -90,6 +91,7 @@ const usageOptions = [
   { value: 3, label: "3 uses" },
   { value: 5, label: "5 uses" },
   { value: 10, label: "10 uses" },
+  { value: 0, label: "Unlimited" },
 ];
 
 export function NavInvitePeopleDialog({
@@ -135,8 +137,8 @@ export function NavInvitePeopleDialog({
 
     try {
       const response = await Projects.createInvite(selectedProject, {
-        duration: settings.duration,
-        max_usage: settings.maxUses,
+        duration: settings.duration === "never" ? undefined : settings.duration,
+        max_usage: settings.maxUses === 0 ? undefined : settings.maxUses,
       });
 
       const link = `${clientEnv.inviteUrl}${response.id}`;

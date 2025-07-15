@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { Notification } from "@/models/notifications";
 import { Notifications as NotificationsApi } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
@@ -97,13 +98,30 @@ function NotificationList({
 }
 
 export function NotificationsList() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { setUnreadCount } = useNotificationsStore();
+  const {
+    notifications,
+    setNotifications,
+    setUnreadCount,
+    markNotificationRead,
+    markAllRead,
+  } = useNotificationsStore();
 
   const unreadNotifications = notifications.filter((n) => !n.read);
   const readNotifications = notifications.filter((n) => n.read);
+
+  const handleMarkAllAsRead = async () => {
+    if (unreadNotifications.length === 0) return;
+    try {
+      const response = await NotificationsApi.markAllAsRead();
+      markAllRead();
+      setUnreadCount(response.unread_notifications_count);
+      setError(null);
+    } catch (error) {
+      setError(handleApiError(error));
+    }
+  };
 
   useEffect(() => {
     loadNotifications();
@@ -124,9 +142,7 @@ export function NotificationsList() {
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       const response = await NotificationsApi.markAsRead(notificationId);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
-      );
+      markNotificationRead(notificationId);
       setUnreadCount(response.unread_notifications_count);
       setError(null);
     } catch (error) {
@@ -153,8 +169,19 @@ export function NotificationsList() {
   }
 
   return (
-    <>
-      <TabsContent value="unread" className="mt-4">
+    <div className="relative">
+      {unreadNotifications.length > 0 && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleMarkAllAsRead}
+          // Push up to align with the unread/read navbar above this list
+          className="absolute right-0 -top-10 z-10"
+        >
+          Mark all as read
+        </Button>
+      )}
+      <TabsContent value="unread" className="mt-6">
         <NotificationList
           notifications={unreadNotifications}
           showReadButton={true}
@@ -169,6 +196,6 @@ export function NotificationsList() {
           onMarkAsRead={handleMarkAsRead}
         />
       </TabsContent>
-    </>
+    </div>
   );
 }
