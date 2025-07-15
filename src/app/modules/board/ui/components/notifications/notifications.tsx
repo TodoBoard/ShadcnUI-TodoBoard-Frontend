@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Notification } from "@/models/notifications";
 import { Notifications as NotificationsApi } from "@/lib/api";
@@ -123,11 +123,7 @@ export function NotificationsList() {
     }
   };
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     try {
       const data = await NotificationsApi.getAll();
       setNotifications(data);
@@ -137,7 +133,11 @@ export function NotificationsList() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [setNotifications, setError, setIsLoading]);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
