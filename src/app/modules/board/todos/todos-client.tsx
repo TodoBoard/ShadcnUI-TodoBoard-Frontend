@@ -38,7 +38,7 @@ export function Todos() {
       title: todo.title,
       description: todo.description,
       status: todo.status,
-      priority: todo.priority,
+      priority: todo.priority ?? undefined,
       due_date: todo.due_date,
       dueDate: dueDate,
       dueTime: null,
