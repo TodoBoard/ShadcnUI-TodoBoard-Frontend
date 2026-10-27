@@ -30,6 +30,14 @@ import {
   TodoResponse,
 } from "@/models/todos";
 import { Form } from "@/models/form";
+import {
+  Attachment,
+  AttachmentListResponse,
+  AttachmentUploadResponse,
+  ALLOWED_ATTACHMENT_TYPES,
+  MAX_ATTACHMENT_SIZE,
+} from "@/models/attachments";
+import { compressImage } from "@/utils/image-compression";
 
 const api = axios.create({
   baseURL: clientEnv.apiUrl,
@@ -388,6 +396,75 @@ export const Todos = {
   deleteTodo: async (todoId: string): Promise<{ message: string }> => {
     try {
       const response = await api.delete<{ message: string }>(`/todo/${todoId}`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+};
+
+export const Attachments = {
+  getTodoAttachments: async (todoId: string): Promise<AttachmentListResponse> => {
+    try {
+      const response = await api.get<AttachmentListResponse>(
+        `/todo/${todoId}/attachments`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  /**
+   * Compresses images, reserves quota in the backend, uploads the file
+   * directly to R2 and confirms it. The file never passes through our server.
+   */
+  uploadAttachment: async (
+    todoId: string,
+    file: File,
+    onProgress?: (percent: number) => void
+  ): Promise<Attachment> => {
+    if (!ALLOWED_ATTACHMENT_TYPES.includes(file.type)) {
+      throw "File type not allowed";
+    }
+    const upload = await compressImage(file);
+    if (upload.size > MAX_ATTACHMENT_SIZE) {
+      throw `File too large (max ${MAX_ATTACHMENT_SIZE / 1024 / 1024} MB)`;
+    }
+
+    try {
+      const { data } = await api.post<AttachmentUploadResponse>(
+        `/todo/${todoId}/attachments`,
+        { filename: upload.name, content_type: upload.type, size: upload.size }
+      );
+
+      // Plain axios on purpose: the api instance would add our auth header,
+      // which must never be sent to R2 and would break the signature.
+      await axios.put(data.upload_url, upload, {
+        headers: data.upload_headers,
+        onUploadProgress: (event) => {
+          if (onProgress && event.total) {
+            onProgress(Math.round((event.loaded / event.total) * 100));
+          }
+        },
+      });
+
+      const response = await api.post<Attachment>(
+        `/attachment/${data.attachment.id}/confirm`
+      );
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  deleteAttachment: async (
+    attachmentId: string
+  ): Promise<{ message: string; attachment_count: number }> => {
+    try {
+      const response = await api.delete<{ message: string; attachment_count: number }>(
+        `/attachment/${attachmentId}`
+      );
       return response.data;
     } catch (error) {
       throw handleApiError(error);

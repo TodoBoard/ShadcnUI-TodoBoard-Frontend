@@ -48,7 +48,7 @@ interface TodosStore {
   selectedProjectId: string | undefined;
   setSelectedProjectId: (id: string) => void;
   fetchTodos: (projectId: string, assignedOnly?: boolean) => Promise<void>;
-  createTodo: (todo: TodoCreate) => Promise<void>;
+  createTodo: (todo: TodoCreate) => Promise<Todo | undefined>;
   updateTodo: (todoId: string, todo: TodoUpdateSchema) => Promise<void>;
   deleteTodo: (todoId: string) => Promise<void>;
   getProjectTodos: (projectId: string) => Todo[];
@@ -56,6 +56,7 @@ interface TodosStore {
   silentlyRefreshTodos: (projectId: string) => Promise<void>;
   upsertTodo: (todo: Todo) => void;
   removeTodo: (id: string) => void;
+  setAttachmentCount: (id: string, count: number) => void;
 }
 
 export const useTodosStore = create<TodosStore>((set, get) => ({
@@ -89,6 +90,7 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
     try {
       const newTodo = await Todos.createTodo(todo);
       get().upsertTodo(newTodo);
+      return newTodo;
     } catch (error) {
       const errorMessage =
         typeof error === "string" ? error : "Failed to create todo";
@@ -165,6 +167,13 @@ export const useTodosStore = create<TodosStore>((set, get) => ({
   },
   removeTodo: (id: string) => {
     set((state) => ({ todos: state.todos.filter((t) => t.id !== id) }));
+  },
+  setAttachmentCount: (id: string, count: number) => {
+    set((state) => ({
+      todos: state.todos.map((t) =>
+        t.id === id ? { ...t, attachment_count: count } : t
+      ),
+    }));
   },
   upsertTodo: (todo: Todo) => {
     set((state) => {

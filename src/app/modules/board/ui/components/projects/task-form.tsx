@@ -23,10 +23,15 @@ import { PrioritySelect } from "./priority-select";
 import { useRef, useEffect, useState } from "react";
 import { useProjectsStore } from "@/store/projects";
 import { useTodosStore } from "@/store/todos";
-import { Send } from "lucide-react";
+import { Paperclip, Send, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { composeTitle, sanitizeTitle } from "@/utils/mentions";
 import { TeamMember } from "@/models/projects";
+import {
+  ATTACHMENT_ACCEPT,
+  TaskAttachments,
+  formatFileSize,
+} from "./task-attachments";
 
 interface TaskFormData {
   title: string;
@@ -35,6 +40,8 @@ interface TaskFormData {
   dueTime: string | null;
   priority: string | undefined;
   assignedUserId?: string | null;
+  // Files picked before the task exists, uploaded right after creating it.
+  files?: File[];
 }
 
 interface TaskFormProps {
@@ -45,6 +52,7 @@ interface TaskFormProps {
   isEditing?: boolean;
   currentProjectId: string;
   teamMembers: TeamMember[];
+  todoId?: string;
 }
 
 export function TaskForm({
@@ -55,8 +63,10 @@ export function TaskForm({
   isEditing = false,
   currentProjectId,
   teamMembers,
+  todoId,
 }: TaskFormProps) {
   const titleInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [showMentions, setShowMentions] = useState(false)
   const [filteredMembers, setFilteredMembers] = useState<TeamMember[]>([])
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(0)
@@ -258,6 +268,60 @@ export function TaskForm({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="mt-3">
+            {todoId ? (
+              <TaskAttachments todoId={todoId} editable />
+            ) : (
+              <>
+                {!!formData.files?.length && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {formData.files.map((file, index) => (
+                      <span
+                        key={`${file.name}-${index}`}
+                        className="flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs text-gray-500"
+                      >
+                        <span className="max-w-[140px] truncate">{file.name}</span>
+                        <span className="text-gray-400">{formatFileSize(file.size)}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onChange({
+                              ...formData,
+                              files: formData.files?.filter((_, i) => i !== index),
+                            })
+                          }
+                          aria-label={`Remove ${file.name}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-purple-500 transition-colors"
+                >
+                  <Paperclip className="w-3 h-3" />
+                  Attach files
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept={ATTACHMENT_ACCEPT}
+                  className="hidden"
+                  onChange={(e) => {
+                    const picked = Array.from(e.target.files ?? [])
+                    onChange({ ...formData, files: [...(formData.files ?? []), ...picked] })
+                    e.target.value = ""
+                  }}
+                />
+              </>
+            )}
           </div>
         </TaskCardContent>
         <Separator className="my-2" />

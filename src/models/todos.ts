@@ -14,6 +14,7 @@ export interface Todo {
   assigned_user_id?: string | null;
   assignee_username?: string | null;
   assignee_avatar_id?: number | null;
+  attachment_count?: number;
 }
 
 export interface TodoListResponse {

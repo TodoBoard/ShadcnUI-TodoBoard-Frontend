@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
-import { Calendar as CalendarIcon, Pencil, Trash2 } from "lucide-react";
+import { Calendar as CalendarIcon, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { useState } from "react";
+import { TaskAttachments } from "./task-attachments";
 
 export interface Task {
   id: string;
@@ -22,6 +24,7 @@ export interface Task {
     name: string;
     avatar: string;
   };
+  attachmentCount?: number;
 }
 
 interface TaskItemProps {
@@ -39,6 +42,9 @@ export function TaskItem({
   onDelete,
   disableEdit,
 }: TaskItemProps) {
+  const [showAttachments, setShowAttachments] = useState(false);
+  const attachmentCount = task.attachmentCount ?? 0;
+
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3 py-1.5 w-full overflow-hidden">
@@ -114,6 +120,19 @@ export function TaskItem({
                 <span>@{task.assignee.name}</span>
               </div>
             )}
+            {attachmentCount > 0 && (
+              <button
+                className={cn(
+                  "flex items-center gap-0.5 p-1 hover:bg-gray-100 rounded-full transition-colors",
+                  showAttachments && "text-purple-500"
+                )}
+                onClick={() => setShowAttachments((prev) => !prev)}
+                aria-label="Toggle attachments"
+              >
+                <Paperclip className="w-3 h-3" />
+                <span>{attachmentCount}</span>
+              </button>
+            )}
             {!disableEdit && onEdit && (
               <button
                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -136,6 +155,11 @@ export function TaskItem({
           <p className="text-xs text-gray-500 break-words">
             {task.description}
           </p>
+        )}
+        {showAttachments && attachmentCount > 0 && (
+          <div className="py-1">
+            <TaskAttachments todoId={task.id} />
+          </div>
         )}
         <div className="flex justify-between items-center">
           <div />

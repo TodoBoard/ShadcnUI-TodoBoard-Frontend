@@ -55,6 +55,7 @@ export function Todos() {
               : "",
           }
         : undefined,
+      attachmentCount: todo.attachment_count ?? 0,
     };
   };
 

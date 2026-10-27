@@ -100,6 +100,14 @@ export function RealtimeProvider({ children }: Props) {
         if (id) useTodosStore.getState().removeTodo(id);
         break;
       }
+      case "attachment.created":
+      case "attachment.deleted": {
+        const { todo_id, attachment_count } = data;
+        if (todo_id && typeof attachment_count === "number") {
+          useTodosStore.getState().setAttachmentCount(todo_id, attachment_count);
+        }
+        break;
+      }
       case "notification.new": {
         const notification = data.notification;
         if (notification) {

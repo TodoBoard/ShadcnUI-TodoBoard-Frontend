@@ -36,6 +36,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { uploadFiles } from "@/app/modules/board/ui/components/projects/task-attachments";
 
 interface TaskFormData {
   title: string;
@@ -44,6 +45,7 @@ interface TaskFormData {
   dueTime: string | null;
   priority: string | undefined;
   assignedUserId?: string | null;
+  files?: File[];
 }
 
 export function Projects() {
@@ -147,6 +149,7 @@ export function Projects() {
               : "",
           }
         : undefined,
+      attachmentCount: todo.attachment_count ?? 0,
     };
   };
 
@@ -229,7 +232,10 @@ export function Projects() {
           todoData.due_date = date.toISOString();
         }
 
-        await createTodo(todoData as TodoCreate);
+        const newTodo = await createTodo(todoData as TodoCreate);
+        if (newTodo && formData.files?.length) {
+          uploadFiles(newTodo.id, formData.files);
+        }
 
         if (isMobile) {
           setIsFormVisible(false);
@@ -349,6 +355,7 @@ export function Projects() {
       }}
       currentProjectId={projectId}
       teamMembers={teamMembers}
+      todoId={editingTask?.id}
     />
   );
 
@@ -456,6 +463,7 @@ export function Projects() {
                       currentProjectId={projectId}
                       teamMembers={teamMembers}
                       isEditing={true}
+                      todoId={todo.id}
                     />
                   );
                 }
